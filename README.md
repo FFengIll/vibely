@@ -1,2 +1,2 @@
 # vibely
-My config &amp; setting for vibe coding.
+My config & setting for vibe coding.
