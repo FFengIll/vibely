@@ -1,5 +1,5 @@
-import * as vscode from 'vscode';
 import * as path from 'path';
+import * as vscode from 'vscode';
 
 /**
  * File cache to avoid repeated workspace scans
@@ -236,6 +236,7 @@ class VibelyCompletionProvider implements vscode.CompletionItemProvider {
           description: `Lines ${startLine}-${endLine}`
         }, this.symbolKindToCompletionKind(symbol.kind));
 
+        // Use textEdit for precise control over replacement
         item.insertText = `:${startLine}-${endLine} ${fullName}`;
         item.range = range;
         item.sortText = `${String(symbol.range.start.line).padStart(6, '0')}-${symbol.name}`;
