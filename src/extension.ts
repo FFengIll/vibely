@@ -236,10 +236,14 @@ class VibelyCompletionProvider implements vscode.CompletionItemProvider {
           description: `Lines ${startLine}-${endLine}`
         }, this.symbolKindToCompletionKind(symbol.kind));
 
-        // Use textEdit for precise control over replacement
         item.insertText = `:${startLine}-${endLine} ${fullName}`;
         item.range = range;
         item.sortText = `${String(symbol.range.start.line).padStart(6, '0')}-${symbol.name}`;
+
+        // Delete the # after insertion
+        item.additionalTextEdits = [
+          vscode.TextEdit.delete(new vscode.Range(position.line, hashIndexInLine, position.line, hashIndexInLine + 1))
+        ];
 
         items.push(item);
         count++;
