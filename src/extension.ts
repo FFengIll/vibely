@@ -2,14 +2,50 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 /**
+ * File cache to avoid repeated workspace scans
+ */
+class FileCache {
+  private cache: Map<string, vscode.Uri[]> = new Map();
+  private cacheValid = false;
+  private watcher: vscode.Disposable | undefined;
+
+  constructor() {
+    // Watch for file changes to invalidate cache
+    this.watcher = vscode.workspace.onDidChangeTextDocument(() => {
+      this.invalidate();
+    });
+  }
+
+  get(workspacePath: string): vscode.Uri[] | undefined {
+    if (this.cacheValid) {
+      return this.cache.get(workspacePath);
+    }
+    return undefined;
+  }
+
+  set(workspacePath: string, files: vscode.Uri[]): void {
+    this.cache.set(workspacePath, files);
+    this.cacheValid = true;
+  }
+
+  invalidate(): void {
+    this.cacheValid = false;
+  }
+
+  dispose(): void {
+    this.watcher?.dispose();
+  }
+}
+
+/**
  * Vibely Completion Provider
  * Provides:
  * 1. File path completion triggered by '@'
  * 2. Symbol completion triggered by '#' after a file path
  */
 class VibelyCompletionProvider implements vscode.CompletionItemProvider {
-  // Maximum files to show in completion
   private readonly MAX_FILES = 1000;
+  private fileCache = new FileCache();
 
   /**
    * Main completion entry point
@@ -29,27 +65,27 @@ class VibelyCompletionProvider implements vscode.CompletionItemProvider {
     // Check if we're in symbol completion context: @path/to/file#
     const symbolMatch = textBeforeCursor.match(/@([^\s#:]+)#$/);
     if (symbolMatch) {
-      return this.provideSymbolCompletion(document, position, textBeforeCursor);
+      return this.provideSymbolCompletion(document, position, textBeforeCursor, token);
     }
 
     // Check if we're in file completion context: @partial/path
     const fileMatch = textBeforeCursor.match(/@([^\s#:]*)$/);
     if (fileMatch) {
-      return this.provideFileCompletion(document, position, textBeforeCursor);
+      return this.provideFileCompletion(document, position, textBeforeCursor, token);
     }
 
     return undefined;
   }
 
   /**
-   * Provide file path completion
+   * Provide file path completion using VSCode's built-in file discovery
    */
   private async provideFileCompletion(
     document: vscode.TextDocument,
     position: vscode.Position,
-    textBeforeCursor: string
+    textBeforeCursor: string,
+    token: vscode.CancellationToken
   ): Promise<vscode.CompletionItem[]> {
-    // Extract the partial file path after @
     const match = textBeforeCursor.match(/@([^\s#:]*)$/);
     if (!match) {
       return [];
@@ -58,23 +94,34 @@ class VibelyCompletionProvider implements vscode.CompletionItemProvider {
     const partialPath = match[1];
     const atIndex = textBeforeCursor.lastIndexOf('@');
 
-    // Get workspace folder
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(document.uri);
     if (!workspaceFolder) {
       return [];
     }
 
-    // Find all files in workspace
-    const files = await vscode.workspace.findFiles(
-      '**/*',
-      '**/node_modules/**',
-      this.MAX_FILES
-    );
+    // Check cancellation
+    if (token.isCancellationRequested) {
+      return [];
+    }
 
-    const workspaceRoot = workspaceFolder.uri.fsPath;
+    // Get files (with caching)
+    let files = this.fileCache.get(workspaceFolder.uri.fsPath);
+    if (!files) {
+      files = await vscode.workspace.findFiles(
+        '**/*',
+        '**/node_modules/**',
+        this.MAX_FILES
+      );
+      if (!token.isCancellationRequested) {
+        this.fileCache.set(workspaceFolder.uri.fsPath, files);
+      }
+    }
+
+    if (token.isCancellationRequested) {
+      return [];
+    }
+
     const items: vscode.CompletionItem[] = [];
-
-    // Range to replace: from after '@' to current position
     const range = new vscode.Range(
       position.line,
       atIndex + 1,
@@ -83,31 +130,29 @@ class VibelyCompletionProvider implements vscode.CompletionItemProvider {
     );
 
     for (const file of files) {
-      const filePath = file.fsPath;
+      // Use VSCode's built-in relative path calculation
+      const relativePath = vscode.workspace.asRelativePath(file, false);
 
-      // Calculate relative path from workspace root (not current document)
-      let relativePath = path.relative(workspaceRoot, filePath);
-
-      // Normalize path separators
-      relativePath = relativePath.split(path.sep).join('/');
-
-      // Filter by partial path if user has started typing
+      // Filter by partial path
       if (partialPath && !relativePath.includes(partialPath)) {
         continue;
       }
 
       const item = new vscode.CompletionItem(
-        relativePath,
+        path.basename(relativePath),
         vscode.CompletionItemKind.File
       );
 
-      // Insert only the relative path, @ stays in place
+      // Use VSCode's label details for better display
+      item.label = {
+        label: path.basename(relativePath),
+        description: path.dirname(relativePath) === '.' ? '' : path.dirname(relativePath)
+      };
+
       item.insertText = relativePath;
       item.range = range;
-
-      // Show additional info
-      item.detail = filePath;
-      item.documentation = new vscode.MarkdownString(`File: \`${relativePath}\``);
+      item.detail = file.fsPath;
+      item.sortText = relativePath;
 
       items.push(item);
     }
@@ -116,64 +161,46 @@ class VibelyCompletionProvider implements vscode.CompletionItemProvider {
   }
 
   /**
-   * Provide symbol completion after file path
+   * Provide symbol completion using VSCode's symbol provider
    */
   private async provideSymbolCompletion(
     document: vscode.TextDocument,
     position: vscode.Position,
-    textBeforeCursor: string
+    textBeforeCursor: string,
+    token: vscode.CancellationToken
   ): Promise<vscode.CompletionItem[]> {
-    // Extract file path from pattern like @path/to/file#
     const match = textBeforeCursor.match(/@([^\s#:]+)#$/);
     if (!match) {
       return [];
     }
 
     const filePath = match[1];
-
-    // Resolve the file path relative to workspace root
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(document.uri);
-
     if (!workspaceFolder) {
       return [];
     }
 
-    const workspaceRoot = workspaceFolder.uri.fsPath;
-
-    // Construct absolute path from workspace root
-    let absolutePath: string;
-    if (path.isAbsolute(filePath)) {
-      absolutePath = filePath;
-    } else {
-      absolutePath = path.resolve(workspaceRoot, filePath);
-    }
-
-    // Normalize path
-    absolutePath = absolutePath.split(path.sep).join('/');
-
-    const targetUri = vscode.Uri.file(absolutePath);
-
-    // Check if file exists
-    try {
-      await vscode.workspace.fs.stat(targetUri);
-    } catch {
-      // File doesn't exist
+    // Resolve path using VSCode utilities
+    const targetUri = this.resolveFileUri(filePath, workspaceFolder.uri);
+    if (!targetUri) {
       return [];
     }
 
-    // Get symbols for the target file
+    if (token.isCancellationRequested) {
+      return [];
+    }
+
+    // Use VSCode's symbol provider
     const symbols = await vscode.commands.executeCommand<vscode.DocumentSymbol[]>(
       'vscode.executeDocumentSymbolProvider',
       targetUri
     );
 
-    if (!symbols || symbols.length === 0) {
+    if (!symbols || symbols.length === 0 || token.isCancellationRequested) {
       return [];
     }
 
     const items: vscode.CompletionItem[] = [];
-
-    // Range to replace: the '#' character
     const range = new vscode.Range(
       position.line,
       position.character - 1,
@@ -181,58 +208,65 @@ class VibelyCompletionProvider implements vscode.CompletionItemProvider {
       position.character
     );
 
-    // Process symbols recursively
     const processSymbols = (symbols: vscode.DocumentSymbol[], parentName = '') => {
       for (const symbol of symbols) {
         const fullName = parentName ? `${parentName}.${symbol.name}` : symbol.name;
 
         const item = new vscode.CompletionItem(
-          fullName,
-          this.convertSymbolKind(symbol.kind)
+          symbol.name,
+          this.symbolKindToCompletionKind(symbol.kind)
         );
 
-        // Format: :lineStart-lineEnd SymbolName
         const startLine = symbol.range.start.line + 1;
         const endLine = symbol.range.end.line + 1;
 
-        // Replace '#' with the formatted text
-        const insertText = `:${startLine}-${endLine} ${fullName}`;
-        item.insertText = insertText;
+        item.insertText = `:${startLine}-${endLine} ${fullName}`;
         item.range = range;
-
-        // Additional info
         item.detail = `Lines ${startLine}-${endLine}`;
         item.documentation = new vscode.MarkdownString(
-          `Symbol **${fullName}** in \`${filePath}\`\n\n` +
-          `Kind: \`${vscode.SymbolKind[symbol.kind]}\`\n` +
-          `Range: ${startLine}:${symbol.range.start.character + 1} - ${endLine}:${symbol.range.end.character + 1}`
+          `**${fullName}**\n\nKind: \`${vscode.SymbolKind[symbol.kind]}\``
         );
-
-        // Sort text for better ordering
         item.sortText = `${String(symbol.range.start.line).padStart(6, '0')}-${fullName}`;
 
         items.push(item);
 
-        // Recursively process child symbols
-        if (symbol.children && symbol.children.length > 0) {
+        if (symbol.children?.length > 0) {
           processSymbols(symbol.children, fullName);
         }
       }
     };
 
     processSymbols(symbols);
-
     return items;
   }
 
   /**
-   * Convert vscode.SymbolKind to vscode.CompletionItemKind
+   * Resolve file URI using VSCode workspace utilities
    */
-  private convertSymbolKind(symbolKind: vscode.SymbolKind): vscode.CompletionItemKind {
+  private resolveFileUri(
+    filePath: string,
+    workspaceUri: vscode.Uri
+  ): vscode.Uri | undefined {
+    try {
+      if (path.isAbsolute(filePath)) {
+        return vscode.Uri.file(filePath);
+      }
+      // Resolve relative to workspace root
+      return vscode.Uri.joinPath(workspaceUri, filePath);
+    } catch {
+      return undefined;
+    }
+  }
+
+  /**
+   * Convert SymbolKind to CompletionItemKind
+   */
+  private symbolKindToCompletionKind(symbolKind: vscode.SymbolKind): vscode.CompletionItemKind {
     switch (symbolKind) {
       case vscode.SymbolKind.Function:
-      case vscode.SymbolKind.Method:
         return vscode.CompletionItemKind.Function;
+      case vscode.SymbolKind.Method:
+        return vscode.CompletionItemKind.Method;
       case vscode.SymbolKind.Class:
         return vscode.CompletionItemKind.Class;
       case vscode.SymbolKind.Interface:
@@ -263,7 +297,6 @@ class VibelyCompletionProvider implements vscode.CompletionItemProvider {
 export function activate(context: vscode.ExtensionContext) {
   console.log('Vibely extension is now active!');
 
-  // Register completion provider for @ and # triggers
   const provider = new VibelyCompletionProvider();
 
   const selector: vscode.DocumentSelector = [
@@ -271,38 +304,27 @@ export function activate(context: vscode.ExtensionContext) {
     { scheme: 'file', language: 'markdown' }
   ];
 
-  const fileCompletionDisposable = vscode.languages.registerCompletionItemProvider(
+  // Register with both trigger characters for different contexts
+  const completionDisposable = vscode.languages.registerCompletionItemProvider(
     selector,
     provider,
-    '@' // Trigger character for file completion
+    '@',
+    '#'
   );
 
-  const symbolCompletionDisposable = vscode.languages.registerCompletionItemProvider(
-    selector,
-    provider,
-    '#' // Trigger character for symbol completion
-  );
-
-  // Command to manually trigger vibely completion
-  const triggerCompletionCommand = vscode.commands.registerCommand(
+  const triggerCommand = vscode.commands.registerCommand(
     'tingly-spec.triggerCompletion',
-    () => {
-      vscode.commands.executeCommand('editor.action.triggerSuggest');
-    }
+    () => vscode.commands.executeCommand('editor.action.triggerSuggest')
   );
 
-  context.subscriptions.push(
-    fileCompletionDisposable,
-    symbolCompletionDisposable,
-    triggerCompletionCommand
-  );
+  context.subscriptions.push(completionDisposable, triggerCommand);
 
-  console.log('Vibely completion provider registered for vibely and markdown files');
+  console.log('Vibely completion provider registered');
 }
 
 /**
  * Extension deactivation
  */
 export function deactivate() {
-  console.log('Vibely extension is now deactivated');
+  console.log('Vibely extension deactivated');
 }
