@@ -45,6 +45,7 @@ class FileCache {
  */
 class VibelyCompletionProvider implements vscode.CompletionItemProvider {
   private readonly MAX_FILES = 1000;
+  private readonly MAX_SYMBOLS = 100; // Limit symbols to avoid performance issues
   private fileCache = new FileCache();
 
   /**
@@ -63,14 +64,19 @@ class VibelyCompletionProvider implements vscode.CompletionItemProvider {
     const textBeforeCursor = lineText.substring(0, position.character);
 
     // Check if we're in symbol completion context: @path/to/file#
-    const symbolMatch = textBeforeCursor.match(/@([^\s#:]+)#$/);
+    const symbolMatch = textBeforeCursor.match(/@([^\s#]+)#$/);
     if (symbolMatch) {
       return this.provideSymbolCompletion(document, position, textBeforeCursor, token);
     }
 
     // Check if we're in file completion context: @partial/path
-    const fileMatch = textBeforeCursor.match(/@([^\s#:]*)$/);
+    const fileMatch = textBeforeCursor.match(/@([^\s#]*)$/);
     if (fileMatch) {
+      // If ends with #, provide symbol completion
+      if (textBeforeCursor.endsWith('#')) {
+        return this.provideSymbolCompletion(document, position, textBeforeCursor, token);
+      }
+      // Otherwise provide file completion
       return this.provideFileCompletion(document, position, textBeforeCursor, token);
     }
 
@@ -139,18 +145,13 @@ class VibelyCompletionProvider implements vscode.CompletionItemProvider {
       }
 
       const item = new vscode.CompletionItem(
-        path.basename(relativePath),
+        relativePath,
         vscode.CompletionItemKind.File
       );
 
-      // Use VSCode's label details for better display
-      item.label = {
-        label: path.basename(relativePath),
-        description: path.dirname(relativePath) === '.' ? '' : path.dirname(relativePath)
-      };
-
       item.insertText = relativePath;
       item.range = range;
+      item.filterText = relativePath; // Ensure filtering works on full path
       item.detail = file.fsPath;
       item.sortText = relativePath;
 
@@ -169,7 +170,8 @@ class VibelyCompletionProvider implements vscode.CompletionItemProvider {
     textBeforeCursor: string,
     token: vscode.CancellationToken
   ): Promise<vscode.CompletionItem[]> {
-    const match = textBeforeCursor.match(/@([^\s#:]+)#$/);
+    // Match @path/to/file# - extract file path before #
+    const match = textBeforeCursor.match(/@([^\s#]+)#$/);
     if (!match) {
       return [];
     }
@@ -196,39 +198,50 @@ class VibelyCompletionProvider implements vscode.CompletionItemProvider {
       targetUri
     );
 
-    if (!symbols || symbols.length === 0 || token.isCancellationRequested) {
+    if (!symbols || symbols.length === 0) {
       return [];
     }
 
     const items: vscode.CompletionItem[] = [];
+
+    // Calculate range: from after # to cursor position
+    const lineText = document.lineAt(position.line).text;
+    const hashIndexInLine = lineText.lastIndexOf('#', position.character);
+
+    if (hashIndexInLine === -1) {
+      return [];
+    }
+
     const range = new vscode.Range(
       position.line,
-      position.character - 1,
+      hashIndexInLine + 1,
       position.line,
       position.character
     );
 
+    let count = 0;
     const processSymbols = (symbols: vscode.DocumentSymbol[], parentName = '') => {
       for (const symbol of symbols) {
-        const fullName = parentName ? `${parentName}.${symbol.name}` : symbol.name;
+        if (count >= this.MAX_SYMBOLS) {
+          break;
+        }
 
-        const item = new vscode.CompletionItem(
-          symbol.name,
-          this.symbolKindToCompletionKind(symbol.kind)
-        );
+        const fullName = parentName ? `${parentName}.${symbol.name}` : symbol.name;
 
         const startLine = symbol.range.start.line + 1;
         const endLine = symbol.range.end.line + 1;
 
+        const item = new vscode.CompletionItem({
+          label: symbol.name,
+          description: `Lines ${startLine}-${endLine}`
+        }, this.symbolKindToCompletionKind(symbol.kind));
+
         item.insertText = `:${startLine}-${endLine} ${fullName}`;
         item.range = range;
-        item.detail = `Lines ${startLine}-${endLine}`;
-        item.documentation = new vscode.MarkdownString(
-          `**${fullName}**\n\nKind: \`${vscode.SymbolKind[symbol.kind]}\``
-        );
-        item.sortText = `${String(symbol.range.start.line).padStart(6, '0')}-${fullName}`;
+        item.sortText = `${String(symbol.range.start.line).padStart(6, '0')}-${symbol.name}`;
 
         items.push(item);
+        count++;
 
         if (symbol.children?.length > 0) {
           processSymbols(symbol.children, fullName);
