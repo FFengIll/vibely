@@ -1,17 +1,28 @@
 {
   "name": "tingly-spec",
   "displayName": "tingly-spec",
-  "description": "",
+  "description": "Vibely file reference extension with @ file path and # symbol completion",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.108.0"
+    "vscode": "^1.100.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:vibely",
+    "onLanguage:markdown"
+  ],
   "main": "./out/extension.js",
   "contributes": {
+    "languages": [
+      {
+        "id": "vibely",
+        "aliases": ["Vibely", "vibely"],
+        "extensions": [".vibely"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
     "commands": [
       {
         "command": "tingly-spec.helloWorld",
@@ -28,7 +39,7 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.108.0",
+    "@types/vscode": "^1.100.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
     "@typescript-eslint/eslint-plugin": "^8.45.0",
