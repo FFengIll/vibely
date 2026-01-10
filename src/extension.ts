@@ -13,6 +13,9 @@ class VibelyCompletionProvider implements vscode.CompletionItemProvider {
 
   /**
    * Main completion entry point
+   * Always checks if cursor is in a valid completion context:
+   * - After '@' for file path completion
+   * - After '@path#' for symbol completion
    */
   async provideCompletionItems(
     document: vscode.TextDocument,
@@ -23,13 +26,15 @@ class VibelyCompletionProvider implements vscode.CompletionItemProvider {
     const lineText = document.lineAt(position.line).text;
     const textBeforeCursor = lineText.substring(0, position.character);
 
-    // Handle '#' trigger - symbol completion after file path
-    if (context.triggerCharacter === '#' || textBeforeCursor.endsWith('#')) {
+    // Check if we're in symbol completion context: @path/to/file#
+    const symbolMatch = textBeforeCursor.match(/@([^\s#:]+)#$/);
+    if (symbolMatch) {
       return this.provideSymbolCompletion(document, position, textBeforeCursor);
     }
 
-    // Handle '@' trigger - file path completion
-    if (context.triggerCharacter === '@' || textBeforeCursor.includes('@')) {
+    // Check if we're in file completion context: @partial/path
+    const fileMatch = textBeforeCursor.match(/@([^\s#:]*)$/);
+    if (fileMatch) {
       return this.provideFileCompletion(document, position, textBeforeCursor);
     }
 
@@ -278,7 +283,19 @@ export function activate(context: vscode.ExtensionContext) {
     '#' // Trigger character for symbol completion
   );
 
-  context.subscriptions.push(fileCompletionDisposable, symbolCompletionDisposable);
+  // Command to manually trigger vibely completion
+  const triggerCompletionCommand = vscode.commands.registerCommand(
+    'tingly-spec.triggerCompletion',
+    () => {
+      vscode.commands.executeCommand('editor.action.triggerSuggest');
+    }
+  );
+
+  context.subscriptions.push(
+    fileCompletionDisposable,
+    symbolCompletionDisposable,
+    triggerCompletionCommand
+  );
 
   console.log('Vibely completion provider registered for vibely and markdown files');
 }

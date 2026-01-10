@@ -25,8 +25,16 @@
     ],
     "commands": [
       {
-        "command": "tingly-spec.helloWorld",
-        "title": "Hello World"
+        "command": "tingly-spec.triggerCompletion",
+        "title": "Trigger Vibely Completion"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "tingly-spec.triggerCompletion",
+        "key": "ctrl+alt+space",
+        "mac": "cmd+alt+space",
+        "when": "editorTextFocus && (editorLangId == vibely || editorLangId == markdown)"
       }
     ]
   },
