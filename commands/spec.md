@@ -1,4 +1,4 @@
-/spec is a command to read given spec file (if given), and understand user request to complete task under current project.
+/spec is a command that reads a given spec file (if provided) and understands the user request to complete tasks under the current project.
 
 ## Guideline
 - spec doc
@@ -9,10 +9,10 @@
   - understand user intent and use good design and complete
   - replace solution is allowed for locale and text
 - for backend
-  - task care of current file structure, list dir with limited depth.
-  - write neccessary test for your job in corresponding programming languge habits.
+  - take care of current file structure, list dir with limited depth.
+  - write necessary test for your job in corresponding programming language habits.
   - since backend cost time and may limit by network, take care of some special test cases.
 
 ## Cache
-Since each spec may require to understand the project, cache architecture understanding and reuse it if possible.
+Since each spec may need to understand the project, cache architecture understanding and reuse it if possible.
 The cache could be replaced into ./docs/spec/datetime-arch.md, e.g. ./docs/spec/20260105-arch.md, only update with timestamp.
