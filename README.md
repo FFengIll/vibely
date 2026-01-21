@@ -1,7 +1,9 @@
+# vibe coding
+
+Config / prompt / plugins.
+
 # vibely
 My config & setting for vibe coding.
-
-And an extra vscode plugin `tingly-spec`.
 
 # tingly-spec
 
