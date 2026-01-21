@@ -36,7 +36,7 @@ export abstract class BaseAdapter implements ToolAdapter {
 
   /**
    * Execute a request
-   * Default implementation uses subprocess
+   * Default implementation uses subprocess with output redirected to pipe file
    */
   async execute(request: ToolRequest): Promise<ToolResult> {
     const sessionId = request.options.sessionId ?? this.generateSessionId();
@@ -46,48 +46,70 @@ export abstract class BaseAdapter implements ToolAdapter {
 
     if (!command) {
       const error = `Tool ${this.name} is not configured`;
-      const result = {
+      return {
         success: false,
         output: "",
         error,
         sessionId
       };
-      await this.saveToLog(result, request);
-      return result;
     }
 
+    // Prepare pipe file for raw output
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, -5);
+    const filename = `${this.name}-${timestamp}.log`;
+    const pipeDir = `${process.cwd()}/pipe`;
+    const pipePath = `${pipeDir}/${filename}`;
+
+    // Ensure pipe directory exists
+    const procMkdir = Bun.spawn(["mkdir", "-p", pipeDir], {
+      stdout: "pipe",
+      stderr: "pipe"
+    });
+    await procMkdir.exited;
+
+    // Write pipe header
+    const header = this.formatLogHeader(request, sessionId);
+    await Bun.write(pipePath, header);
+
+    // Build shell command with output redirection to pipe file
+    const shellCmd = `${command} ${args.map(a => `'${a.replace(/'/g, "'\\''")}'`).join(" ")} >> "${pipePath}" 2>&1`;
+
     try {
-      const proc = Bun.spawn([command, ...args], {
+      // Execute via shell with output appended to pipe file
+      const proc = Bun.spawn(["sh", "-c", shellCmd], {
         cwd: request.context.directory.path,
         env: { ...process.env, ...request.context.env },
         stdout: "pipe",
         stderr: "pipe"
       });
 
-      const stdout = await new Response(proc.stdout).text();
-      const stderr = await new Response(proc.stderr).text();
       const exitCode = await proc.exited;
 
-      const result = {
+      // Append footer using shell
+      const footer = `\n${"=".repeat(60)}\nExit Code: ${exitCode}\n`;
+      const footerCmd = `echo '${footer.replace(/'/g, "'\\''")}' >> "${pipePath}"`;
+      const procFooter = Bun.spawn(["sh", "-c", footerCmd], { stdout: "pipe", stderr: "pipe" });
+      await procFooter.exited;
+
+      return {
         success: exitCode === 0,
-        output: stdout,
-        error: stderr || undefined,
+        output: `Output saved to: ${pipePath}`,
+        error: exitCode !== 0 ? `Exit code: ${exitCode}` : undefined,
         sessionId
       };
-
-      // Save output to log file
-      await this.saveToLog(result, request);
-
-      return result;
     } catch (e) {
-      const result = {
+      const error = e instanceof Error ? e.message : String(e);
+      const footer = `\n${"=".repeat(60)}\nError: ${error}\n`;
+      const footerCmd = `echo '${footer.replace(/'/g, "'\\''")}' >> "${pipePath}"`;
+      const procFooter = Bun.spawn(["sh", "-c", footerCmd], { stdout: "pipe", stderr: "pipe" });
+      await procFooter.exited;
+
+      return {
         success: false,
-        output: "",
-        error: e instanceof Error ? e.message : String(e),
+        output: `Pipe saved to: ${pipePath}`,
+        error,
         sessionId
       };
-      await this.saveToLog(result, request);
-      return result;
     }
   }
 
@@ -182,6 +204,29 @@ export abstract class BaseAdapter implements ToolAdapter {
   }
 
   /**
+   * Format log header (written before command output)
+   */
+  private formatLogHeader(request: ToolRequest, sessionId: string): string {
+    const lines: string[] = [];
+
+    lines.push("=".repeat(60));
+    lines.push(`Tool: ${this.name}`);
+    lines.push(`Session ID: ${sessionId}`);
+    lines.push(`Timestamp: ${new Date().toISOString()}`);
+    lines.push("=".repeat(60));
+    lines.push("");
+    lines.push("Prompt:");
+    lines.push(request.prompt);
+    lines.push("");
+    lines.push("-".repeat(60));
+    lines.push("Output:");
+    lines.push("-".repeat(60));
+    lines.push("");
+
+    return lines.join("\n");
+  }
+
+  /**
    * Save execution result to a timestamped log file
    */
   protected async saveToLog(
@@ -190,7 +235,7 @@ export abstract class BaseAdapter implements ToolAdapter {
   ): Promise<void> {
     try {
       // Use the current working directory where bun was started
-      const logsDir = `${Bun.cwd()}/logs`;
+      const logsDir = `${process.cwd()}/logs`;
 
       // Generate timestamp-based filename
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, -5);
