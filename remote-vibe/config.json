@@ -1,0 +1,42 @@
+{
+  "tools": [
+    {
+      "name": "claude-code",
+      "enabled": true,
+      "priority": 1,
+      "command": "claude",
+      "capabilities": ["complex", "multi-file", "architecture"]
+    },
+    {
+      "name": "opencode",
+      "enabled": false,
+      "priority": 2,
+      "endpoint": "http://localhost:3000/api",
+      "capabilities": ["generation", "scaffolding"]
+    },
+    {
+      "name": "cursor",
+      "enabled": false,
+      "priority": 3,
+      "capabilities": ["quick-fix", "single-file"]
+    },
+    {
+      "name": "aider",
+      "enabled": false,
+      "priority": 4,
+      "command": "aider",
+      "capabilities": ["git-aware", "refactoring"]
+    }
+  ],
+  "routing": {
+    "fallbackTool": "claude-code",
+    "allowOverride": true
+  },
+  "api": {
+    "port": 8765,
+    "host": "localhost"
+  },
+  "cli": {
+    "defaultTool": "auto"
+  }
+}
