@@ -1,8 +1,7 @@
+#!/usr/bin/env -S bun run
 /**
  * CLI interface for vibe dispatcher
  */
-
-#!/usr/bin/env -S bun run
 
 import { analyzeRequest } from "../analyzer/index.ts";
 import { getAdapter, getAllAdapters } from "../adapters/index.ts";
@@ -14,7 +13,7 @@ interface CliOptions {
   explain?: boolean;
   interactive?: boolean;
   config?: string;
-  cwd?: string;
+  dir?: string; // Working directory for the task
 }
 
 /**
@@ -42,10 +41,11 @@ export async function main(args: string[]): Promise<void> {
   const prompt = args.join(" ");
 
   if (!prompt && !options.interactive) {
-    console.error("Usage: vibe <prompt>");
-    console.error("       vibe --interactive");
+    console.error("Usage: remote-vibe [options] <prompt>");
+    console.error("       remote-vibe --interactive");
     console.error("");
     console.error("Options:");
+    console.error("  --dir <path>      Working directory for the task (default: current directory)");
     console.error("  --tool <name>     Explicitly select a tool");
     console.error("  --explain         Show routing decision");
     console.error("  --interactive     Start interactive mode");
@@ -71,7 +71,11 @@ function parseArgs(args: string[]): CliOptions {
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
 
-    if (arg === "--tool" && i + 1 < args.length) {
+    if (arg === "--dir" && i + 1 < args.length) {
+      options.dir = args[++i];
+      args.splice(i - 1, 2);
+      i -= 2;
+    } else if (arg === "--tool" && i + 1 < args.length) {
       options.tool = args[++i];
       args.splice(i - 1, 2);
       i -= 2;
@@ -90,8 +94,6 @@ function parseArgs(args: string[]): CliOptions {
     }
   }
 
-  options.cwd = process.cwd();
-
   return options;
 }
 
@@ -103,10 +105,13 @@ async function executeRequest(
   config: typeof DEFAULT_CONFIG,
   options: CliOptions
 ): Promise<void> {
-  const cwd = options.cwd ?? process.cwd();
+  // Resolve the working directory
+  const directory = options.dir
+    ? Bun.resolve(options.dir, process.cwd())
+    : process.cwd();
 
   // Analyze request to determine tool
-  const analysis = analyzeRequest(prompt, { cwd });
+  const analysis = analyzeRequest(prompt, { directory });
 
   let toolName = options.tool ?? config.cli?.defaultTool;
 
@@ -118,6 +123,7 @@ async function executeRequest(
   if (options.explain) {
     console.error(`Task: ${analysis.taskType}`);
     console.error(`Complexity: ${analysis.complexity}/10`);
+    console.error(`Directory: ${directory}`);
     console.error(`Suggested: ${analysis.suggestedTool} (confidence: ${analysis.confidence})`);
     console.error(`Reasoning: ${analysis.reasoning}`);
     console.error(`Using: ${toolName}`);
@@ -146,7 +152,11 @@ async function executeRequest(
   try {
     const result = await adapter.execute({
       prompt,
-      context: { cwd },
+      context: {
+        directory: {
+          path: directory
+        }
+      },
       options: { sessionId: session.id, stream: false }
     });
 

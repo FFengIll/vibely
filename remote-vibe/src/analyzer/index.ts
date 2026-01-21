@@ -51,8 +51,10 @@ const COMPLEXITY_KEYWORDS = {
 
 /**
  * Analyze a request and determine the best tool
+ * @param input - User's prompt
+ * @param context - Optional context including working directory
  */
-export function analyzeRequest(input: string, context?: { cwd?: string }): RequestAnalysis {
+export function analyzeRequest(input: string, context?: { directory?: string }): RequestAnalysis {
   const normalizedInput = input.toLowerCase().trim();
 
   // Detect task type
@@ -61,16 +63,13 @@ export function analyzeRequest(input: string, context?: { cwd?: string }): Reque
   // Calculate complexity
   const complexity = calculateComplexity(normalizedInput, taskType);
 
-  // Extract affected files (simplified - in real implementation would parse file references)
-  const affectedFiles = extractFileReferences(input);
-
   // Determine suggested tool based on task type and complexity
-  const result = selectTool(taskType, complexity, affectedFiles);
+  const result = selectTool(taskType, complexity);
 
   return {
     taskType,
     complexity,
-    affectedFiles,
+    affectedDirectory: context?.directory,
     suggestedTool: result.tool,
     confidence: result.confidence,
     reasoning: result.reasoning
@@ -172,8 +171,7 @@ function extractFileReferences(input: string): string[] {
  */
 function selectTool(
   taskType: TaskType,
-  complexity: number,
-  affectedFiles: string[]
+  complexity: number
 ): { tool: string; confidence: number; reasoning: string } {
   // Complex reasoning, multi-file -> Claude Code
   if (complexity > 6 || taskType === "architecture") {

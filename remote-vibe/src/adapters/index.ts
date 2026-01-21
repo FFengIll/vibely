@@ -15,7 +15,7 @@ export type {
   StreamEvent,
   ToolCapability,
   RequestAnalysis,
-  FileContext,
+  DirectoryContext,
   ToolConfig,
   RoutingConfig
 } from "./types.ts";

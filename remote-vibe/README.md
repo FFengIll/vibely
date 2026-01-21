@@ -26,11 +26,14 @@ bun install
 ### CLI
 
 ```bash
-# Basic usage (auto-detect best tool)
+# Basic usage (auto-detect best tool, runs in current directory)
 bun run src/cli/index.ts "add user authentication to the app"
 
+# Specify a working directory for the task
+bun run src/cli/index.ts --dir /path/to/project "refactor the database layer"
+
 # Explicit tool selection
-bun run src/cli/index.ts --tool claude-code "refactor the database layer"
+bun run src/cli/index.ts --tool claude-code "fix the authentication bug"
 
 # Show routing decision
 bun run src/cli/index.ts --explain "optimize the queries"
@@ -63,7 +66,9 @@ curl -X POST http://localhost:8765/api/v1/execute \
     "options": {
       "stream": false,
       "context": {
-        "cwd": "/path/to/project"
+        "directory": "/path/to/project",
+        "include": ["src/**/*.ts"],
+        "exclude": ["node_modules/**"]
       }
     }
   }'
@@ -74,7 +79,10 @@ curl -X POST http://localhost:8765/api/v1/execute \
 curl -X POST http://localhost:8765/api/v1/analyze \
   -H "Content-Type: application/json" \
   -d '{
-    "prompt": "optimize the queries"
+    "prompt": "optimize the queries",
+    "context": {
+      "directory": "/path/to/project"
+    }
   }'
 ```
 

@@ -16,8 +16,12 @@ interface ExecuteRequest {
   options?: {
     stream?: boolean;
     context?: {
-      cwd?: string;
-      files?: Array<{ path: string; content?: string; language?: string }>;
+      /** Directory where the task should be executed */
+      directory?: string;
+      /** Optional: file patterns to include */
+      include?: string[];
+      /** Optional: file patterns to exclude */
+      exclude?: string[];
     };
   };
 }
@@ -62,13 +66,13 @@ export function createApi(config: typeof DEFAULT_CONFIG = DEFAULT_CONFIG) {
 
   // Analyze a request (explain routing)
   app.post("/api/v1/analyze", async (c) => {
-    const { prompt } = await c.req.json<{ prompt: string }>();
+    const { prompt, context } = await c.req.json<{ prompt: string; context?: { directory?: string } }>();
 
     if (!prompt) {
       return c.json<ErrorResponse>({ error: "prompt is required" }, 400);
     }
 
-    const analysis = analyzeRequest(prompt);
+    const analysis = analyzeRequest(prompt, { directory: context?.directory });
 
     return c.json<ExplainResponse>({
       taskType: analysis.taskType,
@@ -87,10 +91,11 @@ export function createApi(config: typeof DEFAULT_CONFIG = DEFAULT_CONFIG) {
       return c.json<ErrorResponse>({ error: "prompt is required" }, 400);
     }
 
-    const cwd = body.options?.context?.cwd ?? process.cwd();
+    // Resolve the working directory
+    const directory = body.options?.context?.directory ?? process.cwd();
 
     // Analyze request to determine tool
-    const analysis = analyzeRequest(body.prompt, { cwd });
+    const analysis = analyzeRequest(body.prompt, { directory });
 
     let toolName = body.tool ?? "auto";
 
@@ -140,12 +145,11 @@ export function createApi(config: typeof DEFAULT_CONFIG = DEFAULT_CONFIG) {
           {
             prompt: body.prompt,
             context: {
-              cwd,
-              files: body.options?.context?.files?.map(f => ({
-                path: f.path,
-                content: f.content,
-                language: f.language
-              }))
+              directory: {
+                path: directory,
+                include: body.options?.context?.include,
+                exclude: body.options?.context?.exclude
+              }
             },
             options: { sessionId: session.id, stream: true }
           },
@@ -162,12 +166,11 @@ export function createApi(config: typeof DEFAULT_CONFIG = DEFAULT_CONFIG) {
         const result = await adapter.execute({
           prompt: body.prompt,
           context: {
-            cwd,
-            files: body.options?.context?.files?.map(f => ({
-              path: f.path,
-              content: f.content,
-              language: f.language
-            }))
+            directory: {
+              path: directory,
+              include: body.options?.context?.include,
+              exclude: body.options?.context?.exclude
+            }
           },
           options: { sessionId: session.id, stream: false }
         });

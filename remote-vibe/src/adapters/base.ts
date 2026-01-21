@@ -55,7 +55,7 @@ export abstract class BaseAdapter implements ToolAdapter {
 
     try {
       const proc = Bun.spawn([command, ...args], {
-        cwd: request.context.cwd,
+        cwd: request.context.directory.path,
         env: { ...process.env, ...request.context.env },
         stdout: "pipe",
         stderr: "pipe"
@@ -109,7 +109,7 @@ export abstract class BaseAdapter implements ToolAdapter {
 
     try {
       const proc = Bun.spawn([command, ...args], {
-        cwd: request.context.cwd,
+        cwd: request.context.directory.path,
         env: { ...process.env, ...request.context.env },
         stdout: "pipe",
         stderr: "pipe"

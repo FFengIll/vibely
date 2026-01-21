@@ -12,17 +12,25 @@ export enum TaskType {
   QuickFix = "quick_fix"
 }
 
-export interface FileContext {
+/**
+ * Directory context for task execution
+ * The tool will work within this directory/project
+ */
+export interface DirectoryContext {
+  /** Absolute path to the project directory */
   path: string;
-  content?: string;
-  language?: string;
+  /** Optional: specific file patterns to include (glob patterns) */
+  include?: string[];
+  /** Optional: specific file patterns to exclude (glob patterns) */
+  exclude?: string[];
 }
 
 export interface ToolRequest {
   prompt: string;
   context: {
-    files?: FileContext[];
-    cwd?: string;
+    /** Directory where the task should be executed */
+    directory: DirectoryContext;
+    /** Optional: environment variables for the execution */
     env?: Record<string, string>;
   };
   options: {
@@ -81,7 +89,7 @@ export interface ToolCapability {
 export interface RequestAnalysis {
   taskType: TaskType;
   complexity: number; // 1-10
-  affectedFiles: string[];
+  affectedDirectory?: string; // Directory that will be affected
   suggestedTool: string;
   confidence: number; // 0-1
   reasoning: string;

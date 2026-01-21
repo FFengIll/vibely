@@ -1,5 +1,5 @@
 /**
- * Vibe Dispatcher - Main entry point
+ * Remote Vibe - Main entry point
  */
 
 export { analyzeRequest } from "./analyzer/index.ts";
@@ -18,7 +18,7 @@ export {
   type StreamEvent,
   type ToolCapability,
   type RequestAnalysis,
-  type FileContext,
+  type DirectoryContext,
   TaskType
 } from "./adapters/index.ts";
 export {
