@@ -45,12 +45,15 @@ export abstract class BaseAdapter implements ToolAdapter {
     const args = this.getArgs(request);
 
     if (!command) {
-      return {
+      const error = `Tool ${this.name} is not configured`;
+      const result = {
         success: false,
         output: "",
-        error: `Tool ${this.name} is not configured`,
+        error,
         sessionId
       };
+      await this.saveToLog(result, request);
+      return result;
     }
 
     try {
@@ -65,19 +68,26 @@ export abstract class BaseAdapter implements ToolAdapter {
       const stderr = await new Response(proc.stderr).text();
       const exitCode = await proc.exited;
 
-      return {
+      const result = {
         success: exitCode === 0,
         output: stdout,
         error: stderr || undefined,
         sessionId
       };
+
+      // Save output to log file
+      await this.saveToLog(result, request);
+
+      return result;
     } catch (e) {
-      return {
+      const result = {
         success: false,
         output: "",
         error: e instanceof Error ? e.message : String(e),
         sessionId
       };
+      await this.saveToLog(result, request);
+      return result;
     }
   }
 
@@ -169,5 +179,67 @@ export abstract class BaseAdapter implements ToolAdapter {
    */
   protected generateSessionId(): string {
     return `${this.name}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
+
+  /**
+   * Save execution result to a timestamped log file
+   */
+  protected async saveToLog(
+    result: ToolResult,
+    request: ToolRequest
+  ): Promise<void> {
+    try {
+      // Use the current working directory where bun was started
+      const logsDir = `${Bun.cwd()}/logs`;
+
+      // Generate timestamp-based filename
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, -5);
+      const filename = `${this.name}-${timestamp}.log`;
+      const logPath = `${logsDir}/${filename}`;
+
+      // Format log content
+      const logContent = this.formatLogContent(result, request);
+
+      // Write to file
+      await Bun.write(logPath, logContent);
+    } catch {
+      // Silently fail if logging fails
+    }
+  }
+
+  /**
+   * Format log content
+   */
+  private formatLogContent(
+    result: ToolResult,
+    request: ToolRequest
+  ): string {
+    const lines: string[] = [];
+
+    lines.push("=".repeat(60));
+    lines.push(`Tool: ${this.name}`);
+    lines.push(`Session ID: ${result.sessionId}`);
+    lines.push(`Timestamp: ${new Date().toISOString()}`);
+    lines.push(`Success: ${result.success}`);
+    lines.push("=".repeat(60));
+    lines.push("");
+    lines.push("Prompt:");
+    lines.push(request.prompt);
+    lines.push("");
+    lines.push("-".repeat(60));
+    lines.push("Output:");
+    lines.push("-".repeat(60));
+    lines.push(result.output || "(no output)");
+    lines.push("");
+
+    if (result.error) {
+      lines.push("-".repeat(60));
+      lines.push("Error:");
+      lines.push("-".repeat(60));
+      lines.push(result.error);
+      lines.push("");
+    }
+
+    return lines.join("\n");
   }
 }
