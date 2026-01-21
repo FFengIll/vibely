@@ -106,6 +106,8 @@ export interface ToolConfig {
   args?: string[];
   endpoint?: string;
   capabilities: string[];
+  /** Tool-specific options (e.g., claudeCode options) */
+  options?: Record<string, unknown>;
 }
 
 /**

@@ -5,24 +5,32 @@
       "enabled": true,
       "priority": 1,
       "command": "claude",
-      "capabilities": ["complex", "multi-file", "architecture"]
+      "capabilities": ["complex", "multi-file", "architecture"],
+      "options": {
+        "claudeCode": {
+          "permissionMode": "acceptEdits",
+          "allowedTools": "Bash(*) Read(*) Edit(*) Write(*) Glob(*) Grep(*) AskUserQuestion(*)",
+          "debug": false,
+          "addDir": []
+        }
+      }
     },
     {
       "name": "opencode",
-      "enabled": false,
+      "enabled": true,
       "priority": 2,
       "endpoint": "http://localhost:3000/api",
       "capabilities": ["generation", "scaffolding"]
     },
     {
       "name": "cursor",
-      "enabled": false,
+      "enabled": true,
       "priority": 3,
       "capabilities": ["quick-fix", "single-file"]
     },
     {
       "name": "aider",
-      "enabled": false,
+      "enabled": true,
       "priority": 4,
       "command": "aider",
       "capabilities": ["git-aware", "refactoring"]
@@ -34,7 +42,7 @@
   },
   "api": {
     "port": 8765,
-    "host": "localhost"
+    "host": "0.0.0.0"
   },
   "cli": {
     "defaultTool": "auto"

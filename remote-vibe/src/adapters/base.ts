@@ -27,7 +27,12 @@ export abstract class BaseAdapter implements ToolAdapter {
         stdout: "pipe",
         stderr: "pipe"
       });
+
+      // Add timeout to prevent hanging
+      const timeout = setTimeout(() => proc.kill(), 3000);
       await proc.exited;
+      clearTimeout(timeout);
+
       return proc.exitCode === 0;
     } catch {
       return false;

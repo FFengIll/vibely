@@ -17,6 +17,24 @@ export interface Config {
 }
 
 /**
+ * Claude Code specific options
+ */
+export interface ClaudeCodeOptions {
+  command?: string;
+  permissionMode?: "acceptEdits" | "bypassPermissions" | "default" | "delegate" | "dontAsk" | "plan";
+  allowedTools?: string;
+  debug?: boolean;
+  addDir?: string[];
+}
+
+/**
+ * Helper to get Claude Code options from a tool config
+ */
+export function getClaudeCodeOptions(toolConfig: ToolConfig): ClaudeCodeOptions {
+  return (toolConfig.options?.claudeCode ?? {}) as ClaudeCodeOptions;
+}
+
+/**
  * Default configuration
  */
 export const DEFAULT_CONFIG: Config = {
@@ -27,7 +45,15 @@ export const DEFAULT_CONFIG: Config = {
       priority: 1,
       command: "claude",
       args: [],
-      capabilities: ["complex", "multi-file", "architecture"]
+      capabilities: ["complex", "multi-file", "architecture"],
+      options: {
+        claudeCode: {
+          permissionMode: "acceptEdits",
+          allowedTools: "Bash(*) Read(*) Edit(*) Write(*)",
+          debug: false,
+          addDir: []
+        }
+      }
     },
     {
       name: "opencode",

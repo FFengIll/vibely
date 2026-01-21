@@ -241,12 +241,18 @@ export class OpenCodeAdapter extends BaseAdapter {
   async isAvailable(): Promise<boolean> {
     if (this.endpoint) {
       try {
+        // Add timeout using AbortController
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 3000);
+
         const response = await fetch(`${this.endpoint}/health`, {
           method: "GET",
           headers: {
             ...(this.apiKey && { "Authorization": `Bearer ${this.apiKey}` })
-          }
+          },
+          signal: controller.signal
         });
+        clearTimeout(timeout);
         return response.ok;
       } catch {
         return false;

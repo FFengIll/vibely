@@ -52,7 +52,7 @@ export function createApi(config: typeof DEFAULT_CONFIG = DEFAULT_CONFIG) {
 
   // Get available tools
   app.get("/api/v1/tools", async (c) => {
-    const adapters = getAllAdapters();
+    const adapters = getAllAdapters(config.tools);
     const tools = await Promise.all(
       adapters.map(async (adapter) => ({
         name: adapter.name,
@@ -104,7 +104,8 @@ export function createApi(config: typeof DEFAULT_CONFIG = DEFAULT_CONFIG) {
     }
 
     // Get the adapter
-    const adapter = getAdapter(toolName);
+    const toolConfig = config.tools.find(t => t.name === toolName);
+    const adapter = getAdapter(toolName, toolConfig);
 
     if (!adapter) {
       return c.json<ErrorResponse>({ error: `Tool "${toolName}" not found` }, 404);

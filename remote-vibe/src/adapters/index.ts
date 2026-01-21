@@ -23,18 +23,21 @@ export type {
 
 export { TaskType } from "./types.ts";
 
-import type { ToolAdapter } from "./types.ts";
+import type { ToolAdapter, ToolConfig } from "./types.ts";
 import { ClaudeCodeAdapter } from "./claude-code.ts";
 import { OpenCodeAdapter } from "./opencode.ts";
 import { CursorAdapter } from "./cursor.ts";
 import { AiderAdapter } from "./aider.ts";
+import { getClaudeCodeOptions } from "../config/index.ts";
 
 /**
  * Get all available adapters
  */
-export function getAllAdapters(): ToolAdapter[] {
+export function getAllAdapters(toolConfigs?: ToolConfig[]): ToolAdapter[] {
+  const configMap = new Map(toolConfigs?.map(t => [t.name, t]));
+
   return [
-    new ClaudeCodeAdapter(),
+    createClaudeCodeAdapter(configMap.get("claude-code")),
     new OpenCodeAdapter(),
     new CursorAdapter(),
     new AiderAdapter()
@@ -44,13 +47,33 @@ export function getAllAdapters(): ToolAdapter[] {
 /**
  * Get adapter by name
  */
-export function getAdapter(name: string): ToolAdapter | undefined {
-  const adapters: Record<string, () => ToolAdapter> = {
-    "claude-code": () => new ClaudeCodeAdapter(),
-    "opencode": () => new OpenCodeAdapter(),
-    "cursor": () => new CursorAdapter(),
-    "aider": () => new AiderAdapter()
-  };
+export function getAdapter(name: string, toolConfig?: ToolConfig): ToolAdapter | undefined {
+  switch (name) {
+    case "claude-code":
+      return createClaudeCodeAdapter(toolConfig);
+    case "opencode":
+      return new OpenCodeAdapter();
+    case "cursor":
+      return new CursorAdapter();
+    case "aider":
+      return new AiderAdapter();
+    default:
+      return undefined;
+  }
+}
 
-  return adapters[name]?.();
+/**
+ * Create Claude Code adapter with config
+ */
+function createClaudeCodeAdapter(toolConfig?: ToolConfig): ClaudeCodeAdapter {
+  if (!toolConfig) {
+    return new ClaudeCodeAdapter();
+  }
+
+  const options = getClaudeCodeOptions(toolConfig);
+
+  return new ClaudeCodeAdapter({
+    command: toolConfig.command,
+    ...options
+  });
 }

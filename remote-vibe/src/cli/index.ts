@@ -3,98 +3,86 @@
  * CLI interface for vibe dispatcher
  */
 
-import { analyzeRequest } from "../analyzer/index.ts";
-import { getAdapter, getAllAdapters } from "../adapters/index.ts";
-import { sessionManager } from "../session/index.ts";
-import { DEFAULT_CONFIG, loadConfig, validateConfig } from "../config/index.ts";
+import { analyzeRequest } from "../analyzer/index";
+import { getAdapter } from "../adapters/index";
+import { sessionManager } from "../session/index";
+import { DEFAULT_CONFIG, loadConfig, validateConfig } from "../config/index";
 
-interface CliOptions {
+interface CliFlags {
+  dir?: string;
   tool?: string;
   explain?: boolean;
   interactive?: boolean;
   config?: string;
-  dir?: string; // Working directory for the task
-}
-
-/**
- * Main CLI entry point
- */
-export async function main(args: string[]): Promise<void> {
-  const options = parseArgs(args);
-
-  // Load configuration
-  const config = options.config
-    ? await loadConfig(options.config)
-    : DEFAULT_CONFIG;
-
-  // Validate configuration
-  const validation = validateConfig(config);
-  if (!validation.valid) {
-    console.error("Configuration errors:");
-    for (const error of validation.errors) {
-      console.error(`  - ${error}`);
-    }
-    process.exit(1);
-  }
-
-  // Get the prompt (remaining arguments)
-  const prompt = args.join(" ");
-
-  if (!prompt && !options.interactive) {
-    console.error("Usage: remote-vibe [options] <prompt>");
-    console.error("       remote-vibe --interactive");
-    console.error("");
-    console.error("Options:");
-    console.error("  --dir <path>      Working directory for the task (default: current directory)");
-    console.error("  --tool <name>     Explicitly select a tool");
-    console.error("  --explain         Show routing decision");
-    console.error("  --interactive     Start interactive mode");
-    console.error("  --config <path>   Load configuration from file");
-    process.exit(1);
-  }
-
-  // Interactive mode
-  if (options.interactive) {
-    return runInteractiveMode(config, options);
-  }
-
-  // Execute single request
-  await executeRequest(prompt, config, options);
+  help?: boolean;
+  version?: boolean;
 }
 
 /**
  * Parse command line arguments
  */
-function parseArgs(args: string[]): CliOptions {
-  const options: CliOptions = {};
+function parseArgs(args: string[]): { flags: CliFlags; input: string[] } {
+  const flags: CliFlags = {};
+  const input: string[] = [];
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
 
-    if (arg === "--dir" && i + 1 < args.length) {
-      options.dir = args[++i];
-      args.splice(i - 1, 2);
-      i -= 2;
-    } else if (arg === "--tool" && i + 1 < args.length) {
-      options.tool = args[++i];
-      args.splice(i - 1, 2);
-      i -= 2;
+    if (arg === "-h" || arg === "--help") {
+      flags.help = true;
+    } else if (arg === "-v" || arg === "--version") {
+      flags.version = true;
+    } else if (arg === "-d" || arg === "--dir") {
+      flags.dir = args[++i];
+    } else if (arg === "-t" || arg === "--tool") {
+      flags.tool = args[++i];
     } else if (arg === "--explain") {
-      options.explain = true;
-      args.splice(i, 1);
-      i--;
-    } else if (arg === "--interactive") {
-      options.interactive = true;
-      args.splice(i, 1);
-      i--;
-    } else if (arg === "--config" && i + 1 < args.length) {
-      options.config = args[++i];
-      args.splice(i - 1, 2);
-      i -= 2;
+      flags.explain = true;
+    } else if (arg === "-i" || arg === "--interactive") {
+      flags.interactive = true;
+    } else if (arg === "-c" || arg === "--config") {
+      flags.config = args[++i];
+    } else if (arg.startsWith("-")) {
+      // Skip unknown flags
+      if (arg.startsWith("--") && arg.includes("=")) {
+        const [key, value] = arg.split("=");
+        if (key === "--dir") flags.dir = value;
+        else if (key === "--tool") flags.tool = value;
+        else if (key === "--config") flags.config = value;
+      }
+    } else {
+      input.push(arg);
     }
   }
 
-  return options;
+  return { flags, input };
+}
+
+/**
+ * Show help message
+ */
+function showHelp() {
+  console.log(`
+    Usage
+      $ remote-vibe [prompt]
+      $ remote-vibe tools
+      $ remote-vibe interactive
+
+    Options
+      -d, --dir <path>        Working directory for the task
+      -t, --tool <name>       Explicitly select a tool (claude-code, opencode, cursor, aider)
+      --explain               Show routing decision and tool selection reasoning
+      -i, --interactive       Start interactive mode
+      -c, --config <path>     Load configuration from file
+      -v, --version           Display version number
+      -h, --help              Display this message
+
+    Examples
+      $ remote-vibe "帮我重构这个函数"
+      $ remote-vibe "添加用户认证" --tool claude-code
+      $ remote-vibe "修复登录bug" --explain
+      $ remote-vibe tools
+  `);
 }
 
 /**
@@ -103,7 +91,7 @@ function parseArgs(args: string[]): CliOptions {
 async function executeRequest(
   prompt: string,
   config: typeof DEFAULT_CONFIG,
-  options: CliOptions
+  options: CliFlags
 ): Promise<void> {
   // Resolve the working directory
   const directory = options.dir
@@ -131,7 +119,8 @@ async function executeRequest(
   }
 
   // Get the adapter
-  const adapter = getAdapter(toolName);
+  const toolConfig = config.tools.find(t => t.name === toolName);
+  const adapter = getAdapter(toolName, toolConfig);
   if (!adapter) {
     console.error(`Error: Tool "${toolName}" not found`);
     process.exit(1);
@@ -182,7 +171,7 @@ async function executeRequest(
  */
 async function runInteractiveMode(
   config: typeof DEFAULT_CONFIG,
-  options: CliOptions
+  options: CliFlags
 ): Promise<void> {
   console.error("Vibe Dispatcher - Interactive Mode");
   console.error("Type 'exit' or 'quit' to exit");
@@ -190,7 +179,6 @@ async function runInteractiveMode(
 
   const readline = {
     async question(prompt: string): Promise<string> {
-      // Simple implementation using stdin
       process.stdout.write(prompt);
       const buffer = await Bun.stdin.stream().getReader().read();
       return new TextDecoder().decode(buffer.value ?? new Uint8Array()).trim();
@@ -210,7 +198,90 @@ async function runInteractiveMode(
   }
 }
 
-// Run CLI if this is the main module
-if (import.meta.main) {
-  await main(process.argv.slice(2));
+/**
+ * List available tools
+ */
+async function listTools(config: typeof DEFAULT_CONFIG): Promise<void> {
+  const { getAllAdapters } = await import("../adapters/index");
+  const adapters = getAllAdapters(config.tools);
+
+  console.log("Available tools:");
+  console.log("");
+
+  for (const adapter of adapters) {
+    try {
+      const available = await adapter.isAvailable();
+      const status = available ? "✓" : "✗";
+      const capability = (adapter as any).capability;
+
+      console.log(`  ${status} ${adapter.name}`);
+      if (capability) {
+        console.log(`      Priority: ${capability.priority}`);
+        console.log(`      Strengths: ${capability.strengths.join(", ")}`);
+        console.log(`      Complexity: ${capability.complexity}`);
+      }
+      console.log("");
+    } catch (e) {
+      console.log(`  ✗ ${adapter.name} (error: ${e})`);
+      console.log("");
+    }
+  }
 }
+
+// Main entry point
+async function main() {
+  const { flags, input } = parseArgs(process.argv.slice(2));
+
+  // Handle help
+  if (flags.help) {
+    showHelp();
+    return;
+  }
+
+  // Handle version
+  if (flags.version) {
+    console.log("0.1.0");
+    return;
+  }
+
+  const prompt = input.join(" ");
+
+  // Load configuration
+  const config = flags.config
+    ? await loadConfig(flags.config)
+    : DEFAULT_CONFIG;
+
+  // Validate configuration
+  const validation = validateConfig(config);
+  if (!validation.valid) {
+    console.error("Configuration errors:");
+    for (const error of validation.errors) {
+      console.error(`  - ${error}`);
+    }
+    process.exit(1);
+  }
+
+  // Handle subcommands
+  const command = input[0];
+
+  if (command === "tools") {
+    await listTools(config);
+    return;
+  }
+
+  if (command === "interactive" || flags.interactive) {
+    await runInteractiveMode(config, flags);
+    return;
+  }
+
+  // Show help if no prompt
+  if (!prompt) {
+    showHelp();
+    return;
+  }
+
+  // Execute request
+  await executeRequest(prompt, config, flags);
+}
+
+main().catch(console.error);
