@@ -4,7 +4,7 @@
  */
 
 import { BaseAdapter } from "./base.ts";
-import type { ToolRequest, ToolCapability } from "./types.ts";
+import type { ToolRequest, ToolResult, ToolCapability } from "./types.ts";
 import { TaskType } from "./types.ts";
 
 export interface OpenCodeConfig {
@@ -58,7 +58,7 @@ export class OpenCodeAdapter extends BaseAdapter {
   /**
    * Execute using HTTP API if endpoint is configured, otherwise use CLI
    */
-  async execute(request: ToolRequest): Promise<Awaited<ReturnType<NonNullable<typeof this["execute"]>>>> {
+  async execute(request: ToolRequest): Promise<ToolResult> {
     const sessionId = request.options.sessionId ?? this.generateSessionId();
 
     if (this.endpoint) {
@@ -87,12 +87,14 @@ export class OpenCodeAdapter extends BaseAdapter {
    */
   private async executeViaApi(request: ToolRequest, sessionId: string) {
     if (!this.endpoint) {
-      return {
+      const result = {
         success: false,
         output: "",
         error: "OpenCode endpoint not configured",
         sessionId
       };
+      await this.saveToLog(result, request);
+      return result;
     }
 
     try {
@@ -114,27 +116,33 @@ export class OpenCodeAdapter extends BaseAdapter {
       });
 
       if (!response.ok) {
-        return {
+        const result = {
           success: false,
           output: "",
           error: `API error: ${response.status} ${response.statusText}`,
           sessionId
         };
+        await this.saveToLog(result, request);
+        return result;
       }
 
       const data = await response.json();
-      return {
+      const result = {
         success: true,
         output: data.output ?? "",
         sessionId
       };
+      await this.saveToLog(result, request);
+      return result;
     } catch (e) {
-      return {
+      const result = {
         success: false,
         output: "",
         error: e instanceof Error ? e.message : String(e),
         sessionId
       };
+      await this.saveToLog(result, request);
+      return result;
     }
   }
 

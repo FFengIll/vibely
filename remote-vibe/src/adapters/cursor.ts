@@ -47,12 +47,14 @@ export class CursorAdapter extends BaseAdapter {
   }
 
   async execute(_request: ToolRequest): Promise<ReturnType<typeof this.execute> extends Promise<infer T> ? T : never> {
-    return {
+    const result = {
       success: false,
       output: "",
       error: "Cursor adapter is not yet implemented",
       sessionId: _request.options.sessionId ?? this.generateSessionId()
     } as any;
+    await this.saveToLog(result, _request);
+    return result;
   }
 
   async stream(
