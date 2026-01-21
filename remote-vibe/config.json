@@ -1,50 +1,63 @@
 {
-  "tools": [
-    {
-      "name": "claude-code",
-      "enabled": true,
-      "priority": 1,
-      "command": "claude",
-      "capabilities": ["complex", "multi-file", "architecture"],
-      "options": {
-        "claudeCode": {
-          "permissionMode": "acceptEdits",
-          "allowedTools": "Bash(*) Read(*) Edit(*) Write(*) Glob(*) Grep(*) AskUserQuestion(*)",
-          "debug": false,
-          "addDir": []
+    "tools": [
+        {
+            "name": "claude-code",
+            "enabled": true,
+            "priority": 1,
+            "command": "claude",
+            "capabilities": [
+                "complex",
+                "multi-file",
+                "architecture"
+            ],
+            "options": {
+                "claudeCode": {
+                    "permissionMode": "dontAsk",
+                    "allowedTools": "Bash(*) Read(*) Edit(*) Write(*) Glob(*) Grep(*) AskUserQuestion(*)",
+                    "debug": false,
+                    "addDir": []
+                }
+            }
+        },
+        {
+            "name": "opencode",
+            "enabled": true,
+            "priority": 2,
+            "endpoint": "http://localhost:3000/api",
+            "capabilities": [
+                "generation",
+                "scaffolding"
+            ]
+        },
+        {
+            "name": "cursor",
+            "enabled": false,
+            "priority": 3,
+            "capabilities": [
+                "quick-fix",
+                "single-file"
+            ]
+        },
+        {
+            "name": "aider",
+            "enabled": false,
+            "priority": 4,
+            "command": "aider",
+            "capabilities": [
+                "git-aware",
+                "refactoring"
+            ]
         }
-      }
+    ],
+    "routing": {
+        "fallbackTool": "claude-code",
+        "allowOverride": true
     },
-    {
-      "name": "opencode",
-      "enabled": true,
-      "priority": 2,
-      "endpoint": "http://localhost:3000/api",
-      "capabilities": ["generation", "scaffolding"]
+    "api": {
+        "port": 8765,
+        "host": "0.0.0.0"
     },
-    {
-      "name": "cursor",
-      "enabled": true,
-      "priority": 3,
-      "capabilities": ["quick-fix", "single-file"]
-    },
-    {
-      "name": "aider",
-      "enabled": true,
-      "priority": 4,
-      "command": "aider",
-      "capabilities": ["git-aware", "refactoring"]
+    "cli": {
+        "defaultTool": "auto"
     }
-  ],
-  "routing": {
-    "fallbackTool": "claude-code",
-    "allowOverride": true
-  },
-  "api": {
-    "port": 8765,
-    "host": "0.0.0.0"
-  },
-  "cli": {
-    "defaultTool": "auto"
-  }
 }

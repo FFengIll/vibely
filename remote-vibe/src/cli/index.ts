@@ -127,18 +127,23 @@ async function executeRequest(
   }
 
   // Check if tool is available
+  console.error(`[DEBUG] Checking tool availability...`);
   const available = await adapter.isAvailable();
+  console.error(`[DEBUG] Tool available: ${available}`);
   if (!available) {
     console.error(`Error: Tool "${toolName}" is not available`);
     process.exit(1);
   }
 
   // Create session
+  console.error(`[DEBUG] Creating session...`);
   const session = sessionManager.create(toolName);
+  console.error(`[DEBUG] Session created: ${session.id}`);
   sessionManager.addMessage(session.id, "user", prompt);
 
   // Execute request
   try {
+    console.error(`[DEBUG] Executing with tool: ${toolName}`);
     const result = await adapter.execute({
       prompt,
       context: {
@@ -148,6 +153,8 @@ async function executeRequest(
       },
       options: { sessionId: session.id, stream: false }
     });
+
+    console.error(`[DEBUG] Result - success: ${result.success}, output length: ${result.output?.length ?? 0}`);
 
     if (result.success) {
       console.log(result.output);

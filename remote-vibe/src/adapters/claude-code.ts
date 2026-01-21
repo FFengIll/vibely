@@ -6,7 +6,7 @@
  */
 
 import { BaseAdapter } from "./base.ts";
-import type { ToolRequest, ToolCapability } from "./types.ts";
+import type { ToolRequest, ToolResult, ToolCapability } from "./types.ts";
 import { TaskType } from "./types.ts";
 
 /**
@@ -77,6 +77,10 @@ export class ClaudeCodeAdapter extends BaseAdapter {
       args.push("--debug");
     }
 
+    // Add the target directory as an additional directory
+    // This allows claude to work in the target directory even when run from /tmp
+    args.push("--add-dir", request.context.directory.path);
+
     // Add additional directories if specified
     for (const dir of this.addDir) {
       args.push("--add-dir", dir);
@@ -85,12 +89,25 @@ export class ClaudeCodeAdapter extends BaseAdapter {
     // Use --print for non-interactive output
     args.push("--print");
 
-    // For streaming, use stream-json output format
-    if (request.options.stream) {
-      args.push("--output-format", "stream-json");
-    }
-
     return args;
+  }
+
+  /**
+   * Override execute to work around claude hanging issue
+   * We run claude from /tmp to avoid the hanging issue in certain directories
+   */
+  async execute(request: ToolRequest): Promise<ToolResult> {
+    // Temporarily change to /tmp to run claude (workaround for hanging issue)
+    const originalCwd = process.cwd();
+    process.chdir("/tmp");
+
+    try {
+      // Call parent's execute method
+      return await super.execute(request);
+    } finally {
+      // Restore original directory
+      process.chdir(originalCwd);
+    }
   }
 
   /**
