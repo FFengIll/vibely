@@ -49,20 +49,8 @@ export class OpenCodeAdapter extends BaseAdapter {
   protected getArgs(request: ToolRequest): string[] {
     const args: string[] = [];
 
-    // Add prompt
-    args.push("generate", "--prompt", request.prompt);
-
-    // Add file context if provided
-    if (request.context.files && request.context.files.length > 0) {
-      for (const file of request.context.files) {
-        args.push("--file", file.path);
-      }
-    }
-
-    // Output directory
-    if (request.context.cwd) {
-      args.push("--output", request.context.cwd);
-    }
+    // Use 'run' subcommand with the message
+    args.push("run", request.prompt);
 
     return args;
   }

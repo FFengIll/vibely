@@ -4,6 +4,7 @@
 
 export { BaseAdapter } from "./base.ts";
 export { ClaudeCodeAdapter } from "./claude-code.ts";
+export type { ClaudeCodeConfig } from "./claude-code";
 export { OpenCodeAdapter, type OpenCodeConfig } from "./opencode.ts";
 export { CursorAdapter } from "./cursor.ts";
 export { AiderAdapter } from "./aider.ts";
