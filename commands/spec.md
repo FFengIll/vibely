@@ -16,4 +16,4 @@
 
 ## Cache
 Since each spec may need to understand the project, cache architecture understanding and reuse it if possible.
-The cache could be replaced into ./docs/arch/datetime-arch.md, e.g. ./docs/arch/20260105-arch.md, only update with timestamp.
+The cache could be placed into ./docs/arch/datetime-arch.md, e.g. ./docs/arch/20260105-arch.md, only update with timestamp.
