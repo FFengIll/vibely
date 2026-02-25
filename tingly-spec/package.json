@@ -4,7 +4,7 @@
   "description": "Vibely file reference extension with @ file path and # symbol completion",
   "publisher": "Tingly-Dev",
   "repository": "https://github.com/FFengIll/vibely/tree/main/tingly-spec",
-  "version": "0.0.1",
+  "version": "0.260225.1450",
   "engines": {
     "vscode": "^1.100.0"
   },
