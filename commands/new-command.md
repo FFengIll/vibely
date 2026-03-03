@@ -4,7 +4,7 @@
 
 ## Usage
 ```
-/new-command <command-name> [description]
+/new-command [description]
 ```
 
 When invoked without arguments, it will guide you to define a new command. When provided with an existing command name, it updates that command.
