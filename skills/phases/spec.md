@@ -28,10 +28,9 @@ Creates comprehensive technical specification documents that define what will be
    - Identify dependencies and constraints
 
 2. **Check Architecture Cache**
-   - Look for existing cache in `docs/arch/*-arch.md`
-   - Read most specific cache available (component → module → project)
+   - Use `/sdlc understand [scope]` to generate architecture cache if needed
+   - Read most specific cache available from `docs/arch/`
    - Use cached architecture info for design decisions
-   - Generate new cache if needed
 
 3. **Structure the Specification**
    - Define feature/system scope
@@ -50,7 +49,9 @@ Creates comprehensive technical specification documents that define what will be
    - Save to `docs/spec/YYYYMMDD-[title]-spec.md`
    - Include version and status
 
-## Architecture Cache Integration
+## Architecture Cache
+
+Understand phase generates and maintains architecture cache. Spec phase reads and reuses it.
 
 ### Reading Cache
 
@@ -62,14 +63,16 @@ docs/arch/[module]-arch.md                # Module (~14 days)
 docs/arch/overview-arch.md                # Project (~30 days)
 ```
 
+### Generating Cache
+
+If no relevant cache exists:
+```bash
+# Generate cache for the scope you need
+/sdlc understand src/auth       # Creates auth-arch.md
+/sdlc understand auth/login     # Creates auth/login-arch.md
+```
+
 > **Note**: TTL values are reference guidelines only. Actual freshness depends on code changes.
-
-### Writing Cache
-
-If analyzing new area:
-1. Generate appropriate cache level
-2. Save to `docs/arch/[YYYYMMDD]-[scope]-arch.md`
-3. Include hash for change detection
 
 **See also**: `docs/arch/ARCH_CACHE_SYSTEM.md` for full documentation
 
@@ -199,7 +202,6 @@ interface GlobalState {
 ## References
 
 - [Research documents]
-- [External documentation]
 - [Architecture cache]: `docs/arch/[relevant]-arch.md`
 ```
 
@@ -226,24 +228,32 @@ Examples:
 - [ ] Security considerations addressed
 - [ ] Testing strategy outlined
 - [ ] Dependencies identified
-- [ ] Architecture cache checked/referenced
+- [ ] Architecture cache checked/referenced (use `/sdlc understand` if needed)
 - [ ] Saved to docs/spec/ with date prefix
 
 ## Examples
 
-### Example 1: Feature Specification
+### Example 1: Feature with Existing Cache
 
 ```bash
-/sdlc spec User Profile Management
+# Cache already exists from previous understand
+/sdlc spec "Add OAuth to Auth"
+# Reads docs/arch/auth-arch.md for context
 ```
 
-Creates spec with:
-- User profile data models
-- API endpoints for CRUD operations
-- Profile image upload handling
-- Privacy settings and validation
+### Example 2: Feature Requiring New Cache
 
-### Example 2: System Component
+```bash
+# First, generate architecture cache
+/sdlc understand auth/providers
+# Creates docs/arch/auth/providers-arch.md
+
+# Then write spec using cached context
+/sdlc spec "Add SAML Provider"
+# Uses auth/providers-arch.md
+```
+
+### Example 3: System Component
 
 ```bash
 /sdlc spec Real-time Notification System
@@ -255,39 +265,27 @@ Creates spec with:
 - Subscription mechanisms
 - Delivery guarantees
 
-### Example 3: API Design
-
-```bash
-/sdlc spec Payment Processing API
-```
-
-Creates spec with:
-- Payment intent creation
-- Webhook handling
-- Refund processing
-- Security requirements (PCI compliance)
-
 ## Integration
 
 **Workflow Position:** Research → **Spec** → Coding
 
-The spec phase translates research findings into a concrete implementation plan, ensuring all technical details are thought through before coding begins.
+The spec phase translates research findings and architecture understanding into a concrete implementation plan.
 
 ## Related Skills
 
+- **understand.md** - Generates architecture cache (use before spec)
 - **doc.md** - Create and save specification documents
 - **pencil.md** - Create diagrams for specifications
-- **cache.md** - Architecture caching for context
 - **research.md** - Previous phase: provides foundation
 - **coding.md** - Next phase: implements based on spec
 
 ## Tips
 
+- Run `/sdlc understand [scope]` first to generate architecture cache
 - Be detailed - ambiguity leads to implementation questions
 - Use TypeScript interfaces for all data structures
 - Think about edge cases and error scenarios
 - Consider how the feature will be tested
 - Reference research findings for key decisions
 - Use pencil.md for complex interaction diagrams
-- **Check architecture cache first** - don't re-analyze well-known code
-- **Update cache if needed** - help future specs work faster
+- Architecture cache speeds up spec writing significantly
