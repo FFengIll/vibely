@@ -1,8 +1,8 @@
 # /pr
 
-/pr creates and manages pull requests with proper title, description, and review process. Works standalone or within SDLC workflows.
+/pr generates pull request titles and descriptions based on commit history and code changes. Works standalone or within SDLC workflows.
 
-**Purpose**: Create and manage pull requests for code integration
+**Purpose**: Generate PR content (title + description) for code integration
 
 ## Usage
 
@@ -14,15 +14,15 @@
 - `base-branch` (optional): The base branch to compare against (default: `main`)
 
 **Actions:**
-- No argument: Create a new PR
+- No argument: Generate PR title and description
 - `status` - Check PR status
-- `merge` - Merge PR (when ready)
+- `merge` - Show merge readiness status
 
 **Examples:**
-- `/pr` - Create a new pull request against main
-- `/pr develop` - Create PR against develop branch
+- `/pr` - Generate PR title and description against main
+- `/pr develop` - Generate PR content against develop branch
 - `/pr status` - Check current PR status
-- `/pr merge` - Merge the PR when approved
+- `/pr merge` - Show merge readiness status
 
 **Standalone Use:**
 ```bash
@@ -53,13 +53,15 @@ The project uses conventional commits with lowercase prefixes:
 
 ## PR Generation Process
 
-### 1. Fetch and Update Remote Base Branch
+### 1. Fetch Remote Base Branch (First - Blocking)
+
+**Critical: Must complete before any git operations**
 
 ```bash
 git fetch origin <base-branch>  # default: origin/main
 ```
 
-Ensures PR diff is accurate against latest remote code.
+**Important:** Run this step first and wait for completion. Do NOT run in parallel with subsequent git commands.
 
 ### 2. Get Commit History and Full Diff Together
 
@@ -82,7 +84,8 @@ git diff <base-branch>..HEAD --stat      # Changed files summary
 - Start with brief summary (1-2 sentences)
 - Categorize into **Major** (core functionality, significant features) and **Minor** (small improvements, docs)
 - Use `-` for bullet points, keep concise
-- Optionally include commit title in parentheses
+- Describe what changed, not which commits made the change
+- Focus on the end result and user-facing impact
 
 ### 5. Test Plan (Optional)
 
@@ -119,32 +122,27 @@ chore: update dependencies
 
 **Output PR:**
 ```
-feat: add user authentication
+refactor: provider command refactoring
 
 ## Summary
-Add complete user authentication flow with JWT token management.
+Refactor provider management commands into a unified provider command with interactive mode and UUID-based operations.
 
-### Major: Authentication
-- Add login form component with validation *(feat: add login form with validation)*
-- Implement JWT token generation and validation
-- Fix token validation edge cases *(bugfix: fix token validation)*
+### Major: Provider Command Refactoring
+- Merge add, list, delete commands into single provider command with interactive mode
+- Add interactive mode for provider management (add, list, update, delete, get)
+- Update to use UUID-based provider operations instead of name-based lookups
 
-### Minor: Cleanup
-- Update dependencies to latest versions
+### Minor: Code Cleanup
+- Rename add.go to provider_add.go for consistency
+- Add DeleteProviderByUUID and UpdateProviderByUUID methods to AppManager
+- Update CLI entry point to use new ProviderCommand
+- Remove unused shell command and tool migration code
+- Remove icons from output for cleaner terminal display
 ```
 
 ## Create PR
 
-Using GitHub CLI:
-```bash
-gh pr create --title "feat(auth): add JWT authentication" --body "..."
-```
-
-## Merge PR
-
-```bash
-gh pr merge --merge --delete-branch
-```
+This skill generates the PR title and description. Use the output to create the PR manually or with your preferred tool.
 
 ## SDLC Mode Features
 
