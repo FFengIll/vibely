@@ -119,6 +119,8 @@ docs/
 ├── spec/       # Specs
 ├── research/   # Research docs
 ├── verify/     # Verification reports
+├── report/     # Report after a general work
+├── ref/        # Not for you, but user can put some reference here
 └── archive/    # Archived docs
 
 .sdlc/state.json  # Workflow state
