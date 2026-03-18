@@ -8,50 +8,36 @@ Creates detailed technical specification documents based on research findings an
 /sdlc spec [title]
 ```
 
-## Description
+## Guideline
 
-Creates comprehensive technical specification documents that define what will be built, how it will work, and how components interact. Specs serve as the blueprint for implementation.
+**ALWAYS follow this sequence:**
 
-### When to Use
+1. **Understand First, Design Before Action**
+   - Read the user's request and understand the intent
+   - Review any existing research findings
+   - Think about the problem before jumping to solution
+   - Design the approach in your head first
 
-- After completing research and selecting an approach
-- Before starting implementation work
-- When requirements need to be formally documented
-- For features requiring coordination across multiple developers
-- To document API contracts and data structures
+2. **Read Architecture Cache**
+   - Check `./docs/arch/` for existing architecture documents
+   - Priority order: component → module → project overview
+   - Use cached architecture info to reduce code searching and reading
+   - If no relevant cache exists, generate it first with `/sdlc understand [scope]`
 
-## Process
+3. **Write the Spec Document**
+   - Save to `./docs/spec/YYYYMMDD-[title]-spec.md`
+   - Write the spec along with your understanding and design decisions
+   - Keep specs key-focused and guiding-oriented
+   - Pay attention to model definitions and file/module/function abstractions
 
-1. **Review Research and Requirements**
-   - Review research findings
-   - Clarify functional and non-functional requirements
-   - Identify dependencies and constraints
-
-2. **Check Architecture Cache**
-   - Use `/sdlc understand [scope]` to generate architecture cache if needed
-   - Read most specific cache available from `docs/arch/`
-   - Use cached architecture info for design decisions
-
-3. **Structure the Specification**
-   - Define feature/system scope
-   - Document user stories and use cases
-   - Specify APIs and data structures
-   - Define component interactions
-
-4. **Add Technical Details**
-   - Data models and schemas
-   - API endpoints and contracts
-   - State management approach
-   - Error handling strategy
-   - Security and performance considerations
-
-5. **Save to Documentation**
-   - Save to `docs/spec/YYYYMMDD-[title]-spec.md`
-   - Include version and status
+4. **Output the Design**
+   - After writing the spec, present the design to the user
+   - Use `askUserQuestion` tool to communicate with the user
+   - Use `pencil` skill to show design in text-based graph if helpful
 
 ## Architecture Cache
 
-Understand phase generates and maintains architecture cache. Spec phase reads and reuses it.
+Architecture cache speeds up spec creation by reusing existing understanding.
 
 ### Reading Cache
 
@@ -63,207 +49,72 @@ docs/arch/[module]-arch.md                # Module (~14 days)
 docs/arch/overview-arch.md                # Project (~30 days)
 ```
 
-### Generating Cache
+### Cache Freshness
 
-If no relevant cache exists:
-```bash
-# Generate cache for the scope you need
-/sdlc understand src/auth       # Creates auth-arch.md
-/sdlc understand auth/login     # Creates auth/login-arch.md
-```
+TTL values are reference guidelines:
+- Project level: ~30 days
+- Module level: ~14 days
+- Component level: ~7 days
 
-> **Note**: TTL values are reference guidelines only. Actual freshness depends on code changes.
+If cache is expired or missing, regenerate using `/sdlc understand [scope]`.
 
 **See also**: `docs/arch/ARCH_CACHE_SYSTEM.md` for full documentation
 
-## Specification Template
+## Output Format
 
-```markdown
-# [Spec Title]
+Spec files are saved to `docs/spec/YYYYMMDD-[title]-spec.md`
 
-**Status:** Draft | In Review | Approved
-**Last Updated:** YYYY-MM-DD
+Include:
+- Overview and scope
+- Requirements (functional and non-functional)
+- User stories/use cases
+- Data structures and schemas
+- API endpoints and contracts
+- Component interfaces
+- State management approach
+- Error handling strategy
+- Security considerations
+- Testing strategy
+- Dependencies
+- Implementation phases
+- Open questions
+- Alternatives considered
 
-## Overview
+## Frontend Notes
 
-**Purpose:** [What this spec defines]
-**Scope:** [What's included and out of scope]
-**Background:** [Context and research references]
+- Use the same tech stack, components, theme, and design patterns
+- Understand user intent and implement good design
+- Replacement solutions are allowed for locale and text
 
-## Requirements
+## Backend Notes
 
-### Functional Requirements
-- [Requirement 1]
-- [Requirement 2]
+- Pay attention to current file structure
+- List directories with limited depth
+- Write necessary tests following language conventions
+- Handle special test cases carefully
 
-### Non-Functional Requirements
-- Performance, security, accessibility, etc.
+## IMPORTANT
 
-## User Stories / Use Cases
-
-### Use Case 1: [Title]
-- **Actor:** [User role]
-- **Goal:** [What they want to accomplish]
-- **Steps:** 1. [Step 1] 2. [Step 2] 3. [Step 3]
-- **Success Criteria:** [How we know it works]
-
-## Architecture and Design
-
-### System Overview
-[High-level description]
-
-### Components
-- **[Component A]:** [Purpose and responsibilities]
-- **[Component B]:** [Purpose and responsibilities]
-
-### Data Flow
-[How data flows through the system]
-
-## Data Structures
-
-```typescript
-interface ModelName {
-  field: Type;  // Description
-}
-```
-
-## API Specification
-
-### GET /api/resource
-**Description:** [What it does]
-**Request:** [Request structure]
-**Response:** [Response structure]
-**Status Codes:** 200, 400, 401, 500
-
-## Component Interfaces
-
-```typescript
-interface ComponentAProps {
-  // props
-}
-
-interface ComponentAActions {
-  // methods
-}
-```
-
-## State Management
-
-```typescript
-interface GlobalState {
-  // state shape
-}
-```
-
-## Error Handling
-
-- [Scenario 1]: [Handling approach]
-- [Scenario 2]: [Handling approach]
-
-## Security Considerations
-
-- Authentication, authorization, validation, etc.
-
-## Testing Strategy
-
-- Unit tests: [What to test]
-- Integration tests: [Test scenarios]
-- E2E tests: [Critical flows]
-
-## Dependencies
-
-### Internal
-- [Dependency 1] - [How it's used]
-
-### External
-- [Library 1] - [Purpose]
-
-## Implementation Phases
-
-### Phase 1: [Title]
-- [Tasks and deliverables]
-
-### Phase 2: [Title]
-- [Tasks and deliverables]
-
-## Open Questions
-
-- [Question 1]
-- [Question 2]
-
-## Alternatives Considered
-
-1. **[Alternative 1]**
-   - Why not chosen: [Reason]
-
-2. **[Alternative 2]**
-   - Why not chosen: [Reason]
-
-## References
-
-- [Research documents]
-- [Architecture cache]: `docs/arch/[relevant]-arch.md`
-```
-
-## Output Location
-
-```
-docs/spec/YYYYMMDD-[title]-spec.md
-```
-
-Examples:
-- `docs/spec/20260308-user-auth-spec.md`
-- `docs/spec/20260308-payment-api-spec.md`
-
-## Completion Checklist
-
-- [ ] Overview and scope clearly defined
-- [ ] Requirements documented (functional and non-functional)
-- [ ] User stories/use cases included
-- [ ] Data structures specified with validation
-- [ ] API endpoints documented
-- [ ] Component interfaces defined
-- [ ] State management specified
-- [ ] Error handling documented
-- [ ] Security considerations addressed
-- [ ] Testing strategy outlined
-- [ ] Dependencies identified
-- [ ] Architecture cache checked/referenced (use `/sdlc understand` if needed)
-- [ ] Saved to docs/spec/ with date prefix
+- You can use `askUserQuestion` to communicate with the user or let them choose
+- You can use `pencil` skill to show design in text-based graph
+- DO NOT make spec documents too long and verbose; keep them key-focused
 
 ## Examples
 
 ### Example 1: Feature with Existing Cache
 
 ```bash
-# Cache already exists from previous understand
 /sdlc spec "Add OAuth to Auth"
 # Reads docs/arch/auth-arch.md for context
+# Writes docs/spec/20260318-add-oauth-to-auth-spec.md
 ```
 
 ### Example 2: Feature Requiring New Cache
 
 ```bash
-# First, generate architecture cache
-/sdlc understand auth/providers
-# Creates docs/arch/auth/providers-arch.md
-
-# Then write spec using cached context
-/sdlc spec "Add SAML Provider"
-# Uses auth/providers-arch.md
+/sdlc understand auth/providers    # Create cache first
+/sdlc spec "Add SAML Provider"     # Then write spec
 ```
-
-### Example 3: System Component
-
-```bash
-/sdlc spec Real-time Notification System
-```
-
-Creates spec with:
-- WebSocket connection management
-- Notification types and formats
-- Subscription mechanisms
-- Delivery guarantees
 
 ## Integration
 
@@ -273,19 +124,8 @@ The spec phase translates research findings and architecture understanding into 
 
 ## Related Skills
 
-- **understand.md** - Generates architecture cache (use before spec)
+- **understand.md** - Generates architecture cache
 - **doc.md** - Create and save specification documents
 - **pencil.md** - Create diagrams for specifications
 - **research.md** - Previous phase: provides foundation
 - **coding.md** - Next phase: implements based on spec
-
-## Tips
-
-- Run `/sdlc understand [scope]` first to generate architecture cache
-- Be detailed - ambiguity leads to implementation questions
-- Use TypeScript interfaces for all data structures
-- Think about edge cases and error scenarios
-- Consider how the feature will be tested
-- Reference research findings for key decisions
-- Use pencil.md for complex interaction diagrams
-- Architecture cache speeds up spec writing significantly
