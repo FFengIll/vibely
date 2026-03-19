@@ -60,6 +60,7 @@ Software Development Lifecycle management with intelligent intent detection.
 | `/sdlc pr [action]`      | Create/manage PR                                                |
 | `/sdlc debug [issue]`    | Debug bugs                                                      |
 | `/sdlc research [topic]` | Research solutions                                              |
+| `/sdlc status`           | Show current workflow progress                                  |
 | `/sdlc resume`           | Browse and resume recent work from `.sdlc/docs/`                |
 
 ## Workflows
@@ -72,12 +73,19 @@ Software Development Lifecycle management with intelligent intent detection.
 | `bugfix`   | Bug fixes           | understand → debug → coding → test → verify → commit → pr           |
 | `research` | Research            | understand → research → doc → END                                   |
 
+## Natural Language Flow Control
+
+Workflow progression is handled through natural language:
+
 ```bash
-/sdlc start quick "Fix typo"     # Start workflow
-/sdlc next                       # Next phase
-/sdlc status                     # Show progress
-/sdlc end                        # End workflow
+/sdlc 做个登录功能          # Start feature workflow
+继续 / 下一步                # Proceed to next phase
+跳过测试                     # Skip current phase
+到哪了？                     # Check status
+/sdlc status                # Show detailed progress
 ```
+
+Workflows are created implicitly when you first describe what you want to do.
 
 ## Examples
 
@@ -183,6 +191,12 @@ When `/sdlc` is invoked with arbitrary input:
    - Commit: `commit|save changes|提交|保存`
    - PR: `pull request|pr|submit|提交pr`
 
+4. **Analyze for flow control intents** (natural language only)
+   - Continue/Next: `continue|next|proceed|go on|继续|下一步`
+   - Skip: `skip|bypass|not doing this|跳过|略过`
+   - Status: `status|progress|where am i|what's next|状态|进度|到哪了`
+   - Jump to phase: `go to|jump to|switch to|去|转到|切换到` + phase name
+
 4. **Extract context**
    - Git status (uncommitted changes?)
    - Current branch name
@@ -199,6 +213,16 @@ When `/sdlc` is invoked with arbitrary input:
 # Pseudo-code for routing
 if is_explicit_command(input):
     execute_phase_skill(input)
+elif has_flow_control_intent(input):
+    # Natural language flow control
+    if wants_to_continue(input):
+        advance_to_next_phase()
+    elif wants_to_skip(input):
+        skip_current_phase()
+    elif wants_status(input):
+        execute_status_skill()
+    elif wants_to_jump(input):
+        jump_to_phase(extract_phase_name(input))
 elif has_bugfix_intent(input):
     execute_workflow('bugfix', extract_description(input))
 elif has_feature_intent(input):
@@ -322,11 +346,7 @@ The SDLC system is composed of the following skills organized under `sdlc/`:
 
 | Skill          | Description            | File             |
 | -------------- | ---------------------- | ---------------- |
-| `/sdlc start`  | Start a workflow       | `flow/start.md`  |
-| `/sdlc next`   | Advance to next phase  | `flow/next.md`   |
-| `/sdlc skip`   | Skip current phase     | `flow/skip.md`   |
 | `/sdlc status` | Show workflow progress | `flow/status.md` |
-| `/sdlc phase`  | Change current phase   | `flow/phase.md`  |
 | `/sdlc resume` | Browse and resume work | `flow/resume.md` |
 
 ## Foundation Skills (`skills/sdlc/foundation/`)
