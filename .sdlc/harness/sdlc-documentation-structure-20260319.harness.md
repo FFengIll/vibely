@@ -89,14 +89,22 @@ This harness defines the invariant properties and validation rules for the SDLC 
 **Failure Impact**: HIGH - Breaks type filtering and identification
 
 ### INV-006: Date Format Consistency
-**MUST hold**: Date MUST be YYYYMMDD format in position 3.
+**MUST hold**: Date MUST be YYYYMMDD format.
 
 **Validation:**
 - [ ] Date always 8 digits
-- [ ] Date always between category and type
 - [ ] Date reflects creation date
 
-**Format**: `category-[feature-]YYYYMMDD.type.md`
+**Format by Directory:**
+- `docs/` and `harness/`: `category-feature-YYYYMMDD.type.md`
+- `arch/`: `scope-YYYYMMDD.arch.md` (simplified - directory already isolated)
+
+**Examples:**
+- ✅ `auth-user-login-20240319.spec.md` (docs/)
+- ✅ `auth-flow-invariants-20240319.harness.md` (harness/)
+- ✅ `overview-20240319.arch.md` (arch/ - no category prefix)
+
+**Rationale**: The `arch/` directory only contains `.arch.md` files, so the `arch-` category prefix is redundant. The directory provides the context.
 
 **Dependency**: Naming Convention → Temporal Organization
 
@@ -180,14 +188,19 @@ This harness defines the invariant properties and validation rules for the SDLC 
    - Scope: from parameter (e.g., `auth`, `overview`)
    - Date: current date (e.g., `20240319`)
    - Type: ALWAYS `arch`
-3. Construct filename: `auth-20240319.arch.md` or `overview-20240319.arch.md`
+3. Construct filename: `scope-YYYYMMDD.arch.md`
+   - Example: `overview-20240319.arch.md`
+   - Example: `auth-20240319.arch.md`
+   - Example: `auth-login-20240319.arch.md`
 4. Create file in `.sdlc/arch/`
 
 **Validation Points:**
 - [ ] File created in `arch/` (NOT `docs/` or `harness/`)
 - [ ] Filename has `.arch.md` suffix
+- [ ] Format is `scope-date.arch.md` (NO category prefix needed)
 - [ ] Scope identifies what is cached
-- [ ] Date included for freshness tracking
+
+**Note**: Arch files use simplified format `scope-date.arch.md` instead of `category-scope-date.type.md` because the `arch/` directory already provides type context.
 
 **Dependency Chain**: Understand Command → Metadata Extraction → Filename Construction → File Creation
 
