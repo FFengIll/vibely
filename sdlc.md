@@ -43,6 +43,7 @@ Software Development Lifecycle management with intelligent intent detection and 
 | `/sdlc debug [issue]` | Debug bugs | `actions:debug` |
 | `/sdlc discuss [topic]` | Technical discussion | `actions:discuss` |
 | `/sdlc handoff [task]` | Delegate to subagent | `actions:handoff` |
+| `/sdlc feedback [skill]` | Collect skill feedback | `feedback` |
 | `/sdlc status` | Show workflow progress | `flow:status` |
 | `/sdlc resume` | Browse recent work | `flow:resume` |
 
@@ -83,7 +84,7 @@ Software Development Lifecycle management with intelligent intent detection and 
 
 ### File Naming: `category-feature-date.type.md`
 
-**Document Types**: `spec`, `coding`, `test`, `cr`, `debug`, `research`, `validate`, `secure`, `commit`, `pr`, `guard`, `harness`, `arch`
+**Document Types**: `spec`, `coding`, `test`, `cr`, `debug`, `research`, `validate`, `secure`, `commit`, `pr`, `guard`, `harness`, `arch`, `feedback`
 
 ---
 
@@ -97,7 +98,7 @@ When `/sdlc` receives input:
 
 1. **Check explicit commands first**
    ```
-   guard|understand|cr|spec|harness|coding|test|validate|commit|pr|debug|research|secure|discuss|handoff|status|resume
+   guard|understand|cr|spec|harness|coding|test|validate|commit|pr|debug|research|secure|discuss|handoff|feedback|status|resume
    ```
    → Execute corresponding skill directly
 
@@ -141,6 +142,7 @@ When `/sdlc` receives input:
 /sdlc secure    → actions:secure
 /sdlc discuss   → actions:discuss
 /sdlc handoff   → actions:handoff
+/sdlc feedback  → feedback
 ```
 
 ### Workflow Skills

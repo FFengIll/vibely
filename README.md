@@ -61,20 +61,9 @@ My prompt for ai coding with harness.
 ```
 vibely/
 ├── .sdlc/                          # SDLC configuration and documentation
-│   ├── README.md                   # SDLC directory overview
-│   ├── arch/                       # Architecture documentation
-│   │   ├── cache-metadata.json     # Architecture cache metadata
-│   │   ├── overview-20240319.arch.md
-│   │   ├── sdlc-skill-20240319.arch.md
-│   │   └── skills-20240319.arch.md
-│   ├── archive/                    # Archived documents
-│   │   └── pencil/                 # Pencil-generated archives
-│   ├── cache/                      # Cache directory
-│   ├── harness/                    # Harness configuration files
-│   │   ├── sdlc-documentation-structure-20260319.harness.md
-│   │   └── sdlc-documentation-system-20260319.harness.md
-│   ├── meta/                       # Metadata storage
-│   └── state.json                  # SDLC state tracking
+│   └── harness/                    # Harness configuration files
+│       ├── sdlc-documentation-structure-20260319.harness.md
+│       └── sdlc-documentation-system-20260319.harness.md
 ├── actions/                        # SDLC action definitions (slash commands)
 │   ├── coding.md                   # /coding - Coding phase
 │   ├── commit.md                   # /commit - Commit phase
@@ -92,20 +81,9 @@ vibely/
 │   ├── understand.md               # /understand - Understanding/analysis
 │   └── validate.md                 # /validate - Validation phase
 ├── commands/                       # Extended commands and utilities
-│   ├── archive.md                  # /archive - Archive management
 │   ├── codeclean.md                # /codeclean - Code cleaning
 │   ├── discuss.md                  # Discussion documentation
-│   ├── handoff.md                  # Handoff procedures
-│   ├── new-command.md              # /new-command - Create new commands
-│   ├── optimize-go-test.md         # Go test optimization
-│   ├── refactor-frontend.md        # /refactor-frontend - Frontend refactoring
-│   ├── refactor-go.md              # /refactor-go - Go refactoring
-│   ├── refactor.md                 # /refactor - General refactoring
-│   ├── research.md                 # Research documentation
-│   ├── review-branch.md            # /review-branch - Branch review
-│   ├── review-refactor.md          # /review-refactor - Refactor review
-│   ├── test-go.md                  # /test-go - Go testing
-│   └── update-arch.md              # /update-arch - Architecture updates
+│   └── new-command.md              # /new-command - Create new commands
 ├── flow/                           # Flow control and state management
 │   ├── resume.md                   # /sdlc resume - Resume workflow
 │   └── status.md                   # /sdlc status - Status tracking
@@ -125,19 +103,24 @@ vibely/
 │   └── research.md                 # Research workflow
 ├── resource/                       # Resource files
 │   └── showcase-oauth.png          # OAuth showcase image
-├── scripts/                        # Utility scripts
-│   └── migrate-paths.sh            # Path migration script
 ├── .gitignore                      # Git ignore rules
 ├── README.md                       # This file
 ├── c.md                            # Configuration/notes file
-├── pixel-art.md                    # Pixel art skill
-├── pixel-spinner.md                # Pixel spinner skill
+├── feedback.md                     # Feedback skill
 └── sdlc.md                         # SDLC main documentation
 ```
 
 ## Harness Showcase
 
 ![showcase-oauth](resource/showcase-oauth.png)
+
+
+## Important
+
+- No silver-bullet, so feedback and improve, make it better and better for self
+  - yep, we can catch ideas from https://github.com/karpathy/autoresearch
+  - it is now /feedback
+
 
 # Tingly-spec
 
