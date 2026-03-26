@@ -2,8 +2,6 @@
 
 **Purpose**: Improve code structure without changing functionality.
 
-> **Critical**: Always start with `/sdlc understand` before refactoring. Understanding the existing architecture and relationships is essential to avoid breaking functionality during refactoring.
-
 ## When to Use
 
 Use this workflow when:
@@ -19,260 +17,149 @@ Use this workflow when:
 START
   │
   ▼
-understand → cr → spec → coding → test → validate → secure → cr → commit → pr → MERGE
+understand → spec → coding → test → DONE
 ```
 
-**First Step is Non-Negotiable:**
-1. `understand` - Know the current architecture before changing it
+**Optional Tools** (call when needed):
+- `/sdlc cr` - Code review
+- `/sdlc secure` - Security scan
+- `/sdlc commit` - Commit changes
+- `/sdlc pr` - Create pull request
 
-## Phase Details
+**Core Principle**: Understand first, design, code, verify. Everything else is optional.
 
-### 0. Understand (Required First Step)
+## Core Phases
+
+### 1. Understand (Required)
 ```bash
 /sdlc understand [scope]
 ```
-- Map current architecture and dependencies
-- Identify integration points
-- Understand data flow and relationships
-- **Critical for refactoring - you must know what you're changing**
+Map current architecture before changing it:
+- Current dependencies and relationships
+- Integration points
+- Data flow
+- Potential impact areas
 
-### 1. Initial Code Review
-```bash
-/sdlc cr
-```
-**What it checks:**
-- Current code quality issues
-- Technical debt areas
-- Refactoring opportunities
-- Architecture improvements
-
-**Output**: Refactoring plan and priorities
-
-### 2. Spec
+### 2. Spec (Required)
 ```bash
 /sdlc spec "Design refactoring approach"
 ```
-- Define refactoring goals
-- Document new structure
-- Plan migration strategy
-- Identify breaking changes
-- Create test coverage plan
+Define the refactoring plan:
+- Refactoring goals
+- New structure
+- Migration strategy
+- Breaking changes (if any)
 
-### 3. Coding
+### 3. Coding (Manual)
 ```
-[Manual coding phase]
+[Implement refactoring]
 ```
-- Implement refactoring
 - Maintain existing behavior
-- Add tests for edge cases
-- Update documentation
+- Update related tests
+- Keep changes incremental
 
-### 4. Test
+### 4. Test (Required)
 ```bash
 /sdlc test
 ```
-**What it checks:**
-- lint (code style)
-- typecheck (type validation)
-- format (code formatting)
-- unit (unit tests)
-- integ (integration tests)
-- e2e (end-to-end tests)
-- coverage (test coverage)
+Verify behavior unchanged:
+- All tests pass
+- No regressions
+- Performance maintained
 
-**Critical**: Ensure no behavior changes
+## Optional Tools
 
-### 5. Validate
-```bash
-/sdlc validate [target] [criteria]
-```
-**What it checks:**
-- Behavior preserved (active testing)
-- No breaking changes (unless intentional)
-- Performance improvements verified
-- Related harness invariants still hold
+Use these when needed, not by default:
 
-**Question answered**: "Is functionality unchanged?"
-
-### 6. Secure
-```bash
-/sdlc secure
-```
-**What it checks:**
-- No new vulnerabilities introduced
-- Dependencies still secure
-- No secrets exposed during refactor
-
-### 7. Final Code Review
+### Code Review
 ```bash
 /sdlc cr
 ```
-**What it checks:**
-- Refactoring goals achieved
-- Code quality improved
-- Tests adequate
-- Migration successful
+- Get architecture feedback
+- Review code quality improvements
 
-### 8. Commit
+### Security Scan
+```bash
+/sdlc secure
+```
+- Check for new vulnerabilities
+- Verify dependencies
+
+### Commit & PR
 ```bash
 /sdlc commit
-```
-- Document refactoring changes
-- Reference original issues
-- Note migration steps
-- Highlight breaking changes
-
-### 9. Pull Request
-```bash
 /sdlc pr
 ```
-- Create PR with before/after comparison
-- Include performance metrics
-- Document migration guide
-- Request review
-
-### 10. Merge
-```
-[Merge PR after approval]
-```
-- Merge to main branch
-- Update documentation
-- Communicate changes to team
+- When ready to integrate changes
 
 ## Usage Example
 
 ```bash
-# Start refactor workflow
-/sdlc start refactor "Extract service layer from controllers"
-
-# Step 1: Understand current architecture (MANDATORY)
+# Step 1: Understand current architecture
 /sdlc understand controllers
-# → Map current dependencies, data flow, integration points
+# → Maps dependencies, data flow, integration points
 
-# Step 2: Initial CR - identify issues
-/sdlc cr
-# → Found: Tight coupling, 500+ line controllers, no testability
+# Step 2: Create refactoring spec
+/sdlc spec "Extract service layer from controllers"
+# → Defines goals, new structure, migration plan
 
-# Step 3: Create refactoring spec
-/sdlc spec "Design service layer architecture with dependency injection"
+# Step 3: Implement refactoring
+[Manual coding - extract services, update tests]
 
-# Step 4: [Manual coding - implement refactoring]
-
-# Step 5: Run tests
+# Step 4: Run tests
 /sdlc test
+# → Verifies all tests pass, behavior unchanged
 
-# Step 6: Validate behavior unchanged
-/sdlc validate auth "Behavior preserved after refactoring"
-
-# Step 7: Security check
-/sdlc secure
-
-# Step 8: Final code review
-/sdlc cr
-
-# Step 9: Commit refactoring
-/sdlc commit
-
-# Step 10: Create PR
-/sdlc pr
-
-# [Merge after review]
+# Optional: When ready to integrate
+/sdlc cr      # Code review
+/sdlc commit  # Commit changes
+/sdlc pr      # Create pull request
 ```
 
-## Anti-Pattern: What NOT to Do
+## Navigation Commands
 
 ```bash
-# ❌ BAD: Refactoring without understanding
-/sdlc cr
-# → Start refactoring immediately
-# → Breaks hidden dependencies
-# → Introduces subtle bugs
+# Check current status
+/sdlc status
 
-# ✅ GOOD: Understand first, then refactor
-/sdlc understand controllers  # Know the current system
-/sdlc cr                      # Then plan changes
-# → Safer refactoring, fewer bugs, better results
+# Move to next phase
+/sdlc next
+
+# Skip phase (with reason)
+/sdlc skip "Simple refactor, no spec needed"
 ```
 
 ## Refactoring Categories
 
-### 1. Code Quality
+### Code Quality
 - Reduce complexity
 - Improve naming
 - Extract methods
 - Remove duplication
 
-### 2. Architecture
+### Architecture
 - Separate concerns
 - Introduce patterns
 - Restructure modules
 - Update dependencies
 
-### 3. Performance
+### Performance
 - Optimize algorithms
 - Reduce memory usage
 - Improve caching
-- Database optimization
 
-### 4. Maintainability
+### Maintainability
 - Add type safety
 - Improve testing
 - Update documentation
-- Standardize patterns
 
-## Navigation Commands
+## Key Principles
 
-```bash
-# Move to next phase
-/sdlc next
+1. **Understand First**: Never refactor without understanding the current system
+2. **Preserve Behavior**: Refactoring should not change external behavior
+3. **Small Steps**: Make incremental changes that can be tested
+4. **Test Coverage**: Ensure tests pass before and after
 
-# Skip phase (with reason)
-/sdlc skip "No spec needed for simple cleanup"
+---
 
-# Check current status
-/sdlc status
-
-# Jump to specific phase
-/sdlc goto <phase>
-```
-
-## Completion Checklist
-
-- [ ] **Understand phase completed** (current architecture mapped)
-- [ ] Initial issues documented
-- [ ] Refactoring spec created
-- [ ] Code refactored
-- [ ] All tests passing
-- [ ] Behavior verified unchanged
-- [ ] Performance improved (if applicable)
-- [ ] Security scan clean
-- [ ] Final review approved
-- [ ] Migration documented
-- [ ] PR created and merged
-
-## Key Differences from Feature Workflow
-
-| Feature | Refactor |
-|---------|----------|
-| research → spec | cr → spec |
-| Add new behavior | Preserve behavior |
-| User-facing changes | Internal changes |
-| Test new functionality | Test regression |
-| Verify spec met | Verify behavior unchanged |
-
-## Refactoring Principles
-
-1. **Preserve Behavior**: Refactoring should not change external behavior
-2. **Small Steps**: Make incremental changes that can be tested
-3. **Test Coverage**: Ensure comprehensive tests before refactoring
-4. **Document**: Explain why the refactoring was needed
-5. **Measure**: Use metrics to demonstrate improvement
-
-## Notes
-
-- Refactoring has **two CR phases** - initial and final
-- Test coverage is critical - ensure tests pass before and after
-- Consider feature flags for large refactors
-- May need deprecation period for breaking changes
-- Use `/doc`, `/pencil`, `/cache` for documentation
-- Always validate performance doesn't regress
+**Version**: 2.0.0 | **Updated**: 2026-03-26
