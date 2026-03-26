@@ -1,6 +1,6 @@
 # Harnessly
 
-My prompt for ai coding with harness.
+My prompt for ai coding with harness and feedback
 
 # SDLC with Harness
 
@@ -115,7 +115,14 @@ vibely/
 ![showcase-oauth](resource/showcase-oauth.png)
 
 
-## Important
+# SDLC with Feedback
+
+```
+# tasks done with /sdlc
+
+# now we score them and update them
+/feedback
+```
 
 - No silver-bullet, so feedback and improve, make it better and better for self
   - yep, we can catch ideas from https://github.com/karpathy/autoresearch
