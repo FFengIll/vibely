@@ -7,21 +7,24 @@ Generate pull request content that explains **why** the change exists and **what
 ## Usage
 
 ```
-/pr [base-branch]
+/pr [base-branch] [--fetch]
 ```
 
 | Priority | Method | Example |
 |----------|--------|---------|
-| 1 (highest) | Command arg | `/pr develop` |
-| 2 | state.json `pr.base_branch` | See config below |
-| 3 (lowest) | Default | `origin/main` |
+| 1 (highest) | Command arg | `/pr develop`, `/pr main` |
+| 2 | state.json `pr.base_branch` | `"main"` (local ref) |
+| 3 (lowest) | Auto-detect | `git merge-base` finds `main` or `master` |
+
+**Flags**:
+- `--fetch` — Fetch base branch from remote before diffing (default: local-only)
 
 ### Configuration (state.json)
 
 ```json
 {
   "pr": {
-    "base_branch": "origin/main",
+    "base_branch": "main",
     "remote": "origin",
     "auto_push": false
   }
@@ -30,8 +33,8 @@ Generate pull request content that explains **why** the change exists and **what
 
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
-| `base_branch` | string | `origin/main` | Target branch for the PR |
-| `remote` | string | `origin` | Git remote to use |
+| `base_branch` | string | `main` | Target branch (local ref, e.g. `main`, `develop`) |
+| `remote` | string | `origin` | Git remote (used for `--fetch` and `auto_push`) |
 | `auto_push` | boolean | `false` | Automatically create PR via `gh pr create` |
 
 **Behavior**:
@@ -69,13 +72,32 @@ Fix authentication timeout that caused users to be logged out after 5 minutes of
 
 ## Process
 
-### 1. Fetch & Diff
+### 1. Resolve Base & Diff
+
+**By default, use local refs only (no `git fetch`).** This ensures the diff reflects exactly what's on disk, including unpushed commits.
 
 ```bash
-git fetch origin <branch>           # Get latest remote
-git diff origin/<branch>..HEAD       # What changed
-git diff origin/<branch>..HEAD --stat  # File overview
+# Step 1: Resolve base branch (in priority order)
+# 1. Command arg: /pr develop → base = "refs/heads/develop"
+# 2. state.json pr.base_branch: "main" → base = "refs/heads/main"
+# 3. Auto-detect via git merge-base:
+#    git merge-base --fork-point HEAD refs/heads/main || git merge-base --fork-point HEAD refs/heads/master
+
+# Step 2: Verify base exists locally, abort with clear error if not
+git rev-parse refs/heads/<base> || { echo "Base branch '<base>' not found locally. Use /pr --fetch or create it."; exit 1; }
+
+# Step 3: Diff against local base
+git log <base>..HEAD --oneline        # Commits unique to this branch
+git diff <base>..HEAD --stat          # File overview
+git diff <base>..HEAD                 # Full diff
+
+# If --fetch is passed:
+git fetch origin <base>
+BASE_COMMIT=$(git rev-parse origin/<base>)
+git diff $BASE_COMMIT..HEAD --stat
 ```
+
+**Important**: When resolving the base, strip any `origin/` prefix from user input or config. The base should always resolve to a local ref (`refs/heads/main`), not a remote tracking ref (`origin/main`).
 
 ### 2. Understand the Change
 
@@ -136,6 +158,9 @@ The skill returns PR information based on `auto_push` setting:
 ```markdown
 ## Pull Request Ready
 
+**Base**: main (a1b2c3d) → **HEAD**: bugfix/bot0328 (f7e8d9c)
+**Commits**: 3
+
 **Title**: feat(auth): implement user authentication
 
 **Description**:
@@ -143,7 +168,7 @@ The skill returns PR information based on `auto_push` setting:
 
 **Command to create PR**:
 ```bash
-gh pr create --title "feat: implement user authentication" --body "..." --base origin/main
+gh pr create --title "feat(auth): implement user authentication" --body "..." --base main
 ```
 ```
 
@@ -227,3 +252,7 @@ Provider management was scattered across 4 separate commands with inconsistent U
 - `/commit` - Commits must exist before creating PR
 - `/sdlc cr` - Code review before PR review
 - `/sdlc test` - Tests that must pass
+
+---
+
+**Version**: 1.2.0 | **Updated**: 2026-03-28
