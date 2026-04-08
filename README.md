@@ -234,3 +234,4 @@ vibely/
 # Appendix
 
 - A markdown writing plugin (support *.md) for coding task spec writing - https://github.com/FFengIll/vscode-tingly-spec.git
+- AI Orchestrator - https://github.com/tingly-dev/tingly-box
