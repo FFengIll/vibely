@@ -62,36 +62,42 @@ git branch -vv --sort=-committerdate | head -10
 
 This shows each branch with its upstream (e.g. `[origin/main: ahead 2]`), helping identify the right base.
 
-Then use `AskUserQuestion` to present the top branches as options for the user to select the base. Include `main`/`develop` if not already in the list.
+**When building the candidate list:**
 
-**When building options**, include the upstream info in the description if available:
-- Label: `main`
-- Description: `[origin/main] upstream branch` or `no upstream` if not tracked
+1. **Show local and remote tracking branches separately** — always include both local and remote as distinct options:
+   - `main` (local) — diff against local HEAD
+   - `origin/main` (remote tracking) — diff against remote HEAD (must have fetched locally first)
 
-**Optionally deduplicate**: If multiple branches point to the same commit hash, group them as one option (e.g. label `main` with note "same as origin/main").
+2. **Include common bases** — always add `main` and `develop` (and their `origin/` tracking refs) if they exist.
 
-Once user selects, proceed immediately — no confidence analysis needed.
+3. **Show upstream tracking status** in every option's description:
+   - Local: `main (local) · behind 1`
+   - Remote: `origin/main · tracks origin/main`
+   - No upstream: `feature-branch · no upstream`
+
+4. **Deduplicate by commit hash** — if multiple branches point to the same commit, group them as one option with a note listing the aliases.
+
+5. **IMPORTANT** — When user selects a remote tracking ref like `origin/main`, keep it as-is and diff against that ref directly. DO NOT strip the `origin/` prefix — the user explicitly chose the remote ref.
+
+Then use `AskUserQuestion` to present the candidates. Once user selects, proceed immediately — no confidence analysis needed.
 
 ---
 
-**After base is confirmed**, run the diff (local refs only by default):
+**After base is confirmed**, run the diff:
 
 ```bash
-# Verify base exists locally
-git rev-parse refs/heads/<base> || { echo "Base '<base>' not found locally. Run /pr --fetch or specify branch."; exit 1; }
-
-# Diff against confirmed base
+# For local branch refs (refs/heads/main):
+git rev-parse refs/heads/<base> || { echo "Base '<base>' not found locally."; exit 1; }
 git log <base>..HEAD --oneline        # Commits unique to this branch
 git diff <base>..HEAD --stat          # File overview
 git diff <base>..HEAD                 # Full diff
 
-# If --fetch is passed:
-git fetch origin <base>
-BASE_COMMIT=$(git rev-parse origin/<base>)
-git diff $BASE_COMMIT..HEAD --stat
+# For remote tracking refs (origin/main):
+git rev-parse <base> || { echo "Base '<base>' not found. Run 'git fetch' first."; exit 1; }
+git log <base>..HEAD --oneline        # Commits unique to this branch
+git diff <base>..HEAD --stat          # File overview
+git diff <base>..HEAD                 # Full diff
 ```
-
-**Important**: Strip any `origin/` prefix from input. Base must resolve to a local ref (`refs/heads/main`), not a remote tracking ref (`origin/main`).
 
 ### 2. Understand the Change
 
@@ -146,38 +152,41 @@ Ask yourself:
 
 ### 5. Output Behavior
 
-The skill returns PR information based on `auto_push` setting:
+Output the PR content as **separate plain blocks** — do NOT inline the body into a shell command. This avoids line-wrap issues and makes the output easy to copy.
 
-**Default (`auto_push: false`)**:
-```markdown
+**Format:**
+
+```
 ## Pull Request Ready
 
-**Base**: main (a1b2c3d) → **HEAD**: bugfix/bot0328 (f7e8d9c)
-**Commits**: 3
+**Base**: main → **HEAD**: feat/foo  |  3 commits
 
-**Title**: feat(auth): implement user authentication
+**Title**
+feat(auth): implement user authentication
 
-**Description**:
-[Generated PR description]
+**Description**
+## Summary
+...
+
+### Major
+- ...
+
+### Minor
+- ...
 
 ---
 
-**Choose how to create PR:**
-
-1. **GitHub web** (create manually with prefilled title/body):
-   https://github.com/[owner]/[repo]/compare/main...bugfix/bot0328
-
-2. **GitHub CLI**:
-   ```bash
-   gh pr create --title "feat(auth): implement user authentication" --body "..." --base main
-   ```
-
-3. **Push & create manually**:
-   ```bash
-   git push -u origin bugfix/bot0328
-   # Then visit the compare link above
-   ```
+**Create PR:**
+- GitHub web: https://github.com/[owner]/[repo]/compare/[base]...[head]
+- CLI: `gh pr create --title "[full title here]" --base [base]`  (use Description block above as body)
 ```
+
+**Key rules:**
+- Title on its own line (no inline shell quoting)
+- Description as a clean unescaped block — user copies it directly
+- **GitHub compare URL must be complete and clickable** — resolve `[owner]`, `[repo]`, `[base]`, `[head]` from `git remote get-url origin` and actual branch names
+- **CLI command must be complete** — include the full `--title` value; body is separate (user pastes from Description block)
+- Never embed the full body inline in the shell command — keep body as its own copy block
 
 **With `auto_push: true`**:
 - Automatically executes `gh pr create` with generated content
@@ -252,4 +261,4 @@ Provider management was scattered across 4 separate commands with inconsistent U
 
 ---
 
-**Version**: 1.8.0 | **Updated**: 2026-04-09
+**Version**: 1.10.0 | **Updated**: 2026-04-12
