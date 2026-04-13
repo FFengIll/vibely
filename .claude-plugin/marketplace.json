@@ -1,0 +1,20 @@
+{
+  "name": "sdlc-marketplace",
+  "description": "SDLC (Software Development Lifecycle) plugin marketplace for intelligent development workflow management",
+  "owner": {
+    "name": "FFengIll",
+    "email": "fengyouzheng@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "sdlc",
+      "description": "Software Development Lifecycle management with intelligent intent detection, workflow orchestration, and documentation harness",
+      "version": "1.10.0",
+      "source": "./",
+      "author": {
+        "name": "FFengIll",
+        "email": "fengyouzheng@gmail.com"
+      }
+    }
+  ]
+}

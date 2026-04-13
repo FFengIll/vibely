@@ -1,0 +1,29 @@
+{
+  "name": "sdlc",
+  "description": "Software Development Lifecycle management with intelligent intent detection, workflow orchestration, and documentation harness",
+  "version": "1.10.0",
+  "author": {
+    "name": "FFengIll",
+    "email": "fengyouzheng@gmail.com"
+  },
+  "homepage": "https://github.com/FFengIll/sdlc",
+  "repository": "https://github.com/FFengIll/sdlc",
+  "license": "MIT",
+  "keywords": [
+    "sdlc",
+    "workflow",
+    "development",
+    "documentation",
+    "code-review",
+    "testing",
+    "git",
+    "agile",
+    "lifecycle",
+    "intent-detection",
+    "harness",
+    "architecture-cache",
+    "specification",
+    "debugging",
+    "refactoring"
+  ]
+}
