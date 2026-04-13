@@ -12,6 +12,8 @@ Creates detailed technical specification documents based on research findings an
 
 **ALWAYS follow this sequence:**
 
+### Phase 1: Propose (Requirement-Driven)
+
 1. **Understand First, Design Before Action**
    - Read the user's request and understand the intent
    - Review any existing research findings
@@ -24,9 +26,19 @@ Creates detailed technical specification documents based on research findings an
    - Use cached architecture info to reduce code searching and reading
    - If no relevant cache exists, generate it first with `/sdlc understand [scope]`
 
-3. **Write the Spec Document**
+3. **Present Motivation + Proposal**
+   - Write a brief **Motivation** section: *why* this feature/change is needed
+   - Write a **Proposal** section: *what* will be built at a high level (1-3 paragraphs)
+   - Use `pencil` skill to show a text-based diagram if it helps clarify the design
+   - Use `AskUserQuestion` to confirm direction with the user before proceeding
+   - **Do not write the full spec yet** — wait for user confirmation
+
+### Phase 2: Expand (Full Spec)
+
+4. **Write the Spec Document**
+   - Only after user confirms the proposal direction
    - Save to `./.sdlc/docs/category-feature-date.spec.md`
-   - Write the spec along with your understanding and design decisions
+   - Expand the proposal into a full spec with all relevant sections
    - Keep specs key-focused and guiding-oriented
    - Pay attention to model definitions and file/module/function abstractions
    - **IMPORTANT**: After creating file, display the path to user:
@@ -34,7 +46,7 @@ Creates detailed technical specification documents based on research findings an
      ✅ Spec file created: `.sdlc/docs/recording-impl-20260407.spec.md`
      ```
 
-4. **Output the Design**
+5. **Output the Design**
    - After writing the spec, present the design to the user
    - **Always include file path in output** for easy reference
    - Use `askUserQuestion` tool to communicate with the user
@@ -154,4 +166,4 @@ The spec phase translates research findings and architecture understanding into 
 
 ---
 
-**Version**: 1.1.0 | **Updated**: 2026-04-07
+**Version**: 1.2.0 | **Updated**: 2026-04-12
