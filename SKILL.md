@@ -1,3 +1,8 @@
+---
+name: sdlc
+description: Software Development Lifecycle management with intelligent intent detection and harness. Supports smart natural language routing to workflows (feature, bugfix, refactor, research) and direct actions (understand, spec, coding, test, commit, pr, cr, debug, lint, simplify, etc.).
+---
+
 # /sdlc
 
 Software Development Lifecycle management with intelligent intent detection and harness.
