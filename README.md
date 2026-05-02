@@ -9,9 +9,12 @@ My prompt for ai coding with intent, harness and feedback
 # For claude 
 git clone https://github.com/FFengIll/sdlc.git
 
+mkdir -p ~/.claude/commands/
+
 # /sdlc:sdlc
 cp -R sdlc ~/.claude/commands/
-# or flatten /sdlc
+
+# or flatten /sdlc (recommend)
 cp -R sdlc/* ~/.claude/commands/
 ```
 
