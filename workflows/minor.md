@@ -92,17 +92,6 @@ coding → test → commit → END
 - "Rename this variable"
 - "Adjust this margin"
 
-## Key Differences from Quick Workflow
-
-| Aspect | Minor | Quick |
-|--------|-------|-------|
-| Understand | ❌ Skip | ✅ Required |
-| Spec | ❌ Skip | ✅ Required |
-| Test | Lint + format only | Full test suite |
-| Verify | ❌ Skip | ✅ Required |
-| PR | ❌ Skip | ✅ Required |
-| Overhead | Minimal | Light |
-
 ## Natural Language Examples
 
 ```bash

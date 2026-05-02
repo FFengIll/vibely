@@ -195,22 +195,6 @@ Fix:
 [Description of the fix]
 ```
 
-## Navigation Commands
-
-```bash
-# Move to next phase
-/sdlc next
-
-# Skip phase (with reason)
-/sdlc skip "No security impact for this fix"
-
-# Check current status
-/sdlc status
-
-# Jump to specific phase
-/sdlc goto <phase>
-```
-
 ## Completion Checklist
 
 - [ ] **Understand phase completed** (relevant architecture cache reviewed)

@@ -262,22 +262,6 @@ These have uniquely high TDD value. Prioritize tests for:
 | Existing code, no tests | Prioritize by risk: add tests to critical paths first |
 | Spike / prototype | Skip TDD, but add tests before merging |
 
-## Navigation Commands
-
-```bash
-# Move to next phase
-/sdlc next
-
-# Skip current phase (with reason)
-/sdlc skip "Clarify phase already covered in spec"
-
-# Check current status
-/sdlc status
-
-# Jump to specific phase
-/sdlc goto <phase>
-```
-
 ## Completion Checklist
 
 - [ ] **Understand phase completed**

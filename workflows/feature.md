@@ -188,22 +188,6 @@ understand → research → spec → coding → test → validate → secure →
 # [Then code based on understanding and spec]
 ```
 
-## Navigation Commands
-
-```bash
-# Move to next phase
-/sdlc next
-
-# Skip current phase (with reason)
-/sdlc skip "Phase not applicable for this feature"
-
-# Check current status
-/sdlc status
-
-# Jump to specific phase
-/sdlc goto <phase>
-```
-
 ## Completion Checklist
 
 - [ ] **Understand phase completed** (architecture cache created/reused)

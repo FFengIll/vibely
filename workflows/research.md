@@ -188,19 +188,6 @@ understand → research → doc → discuss → END
 - [Link 2]
 ```
 
-## Navigation Commands
-
-```bash
-# Move to next phase
-/sdlc next
-
-# Check current status
-/sdlc status
-
-# Jump to specific phase
-/sdlc goto <phase>
-```
-
 ## Completion Checklist
 
 - [ ] **Understand phase completed** (know current architecture)

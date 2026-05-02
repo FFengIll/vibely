@@ -116,19 +116,6 @@ Use these when needed, not by default:
 /sdlc pr      # Create pull request
 ```
 
-## Navigation Commands
-
-```bash
-# Check current status
-/sdlc status
-
-# Move to next phase
-/sdlc next
-
-# Skip phase (with reason)
-/sdlc skip "Simple refactor, no spec needed"
-```
-
 ## Refactoring Categories
 
 ### Code Quality
