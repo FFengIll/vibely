@@ -11,8 +11,8 @@ Collect user feedback on skill execution quality, gather improvement suggestions
 **Examples:**
 ```bash
 /improve discuss              # Feedback on discuss skill
-/improve workflows:feature    # Feedback on feature workflow
-/improve actions:coding       # Feedback on coding action
+/improve workflow:feature    # Feedback on feature workflow
+/improve action:coding       # Feedback on coding action
 ```
 
 ## Purpose

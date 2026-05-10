@@ -43,7 +43,7 @@ Software Development Lifecycle management with intelligent intent detection and 
 | action:secure     | secure     | security, secure                                |
 | action:harness    | harness    | harness, verification                           |
 | action:validate   | validate   | validate                                        |
-| feedback           | feedback   | feedback, score                                 |
+| improve           | improve   | improve, score                                 |
 
 ## Workflows
 

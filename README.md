@@ -53,7 +53,7 @@ claude plugin install sdlc@sdlc-marketplace
 ## 2. Direct Action Invocation
 
 ```
-  /actions:<action>: understand | spec | coding | test | commit | cr | pr | regression
+  /action:<action>: understand | spec | coding | test | commit | cr | pr | regression
         │
         ▼
   Action Map
