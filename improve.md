@@ -5,14 +5,14 @@ Collect user feedback on skill execution quality, gather improvement suggestions
 ## Usage
 
 ```bash
-/feedback [skill_name]
+/improve [skill_name]
 ```
 
 **Examples:**
 ```bash
-/feedback discuss              # Feedback on discuss skill
-/feedback workflows:feature    # Feedback on feature workflow
-/feedback actions:coding       # Feedback on coding action
+/improve discuss              # Feedback on discuss skill
+/improve workflows:feature    # Feedback on feature workflow
+/improve actions:coding       # Feedback on coding action
 ```
 
 ## Purpose
@@ -120,12 +120,12 @@ If user approves updates:
    # Read sdlc.root from ~/.sdlc/config.json
    # Backup to: {sdlc.root}/.sdlc.feedback/changelog/backup/
    mkdir -p {sdlc.root}/.sdlc.feedback/changelog/backup
-   cp ~/.claude/commands/feedback.md {sdlc.root}/.sdlc.feedback/changelog/backup/feedback-v1.0.0-20260326.md.bak
+   cp ~/.claude/commands/improve.md {sdlc.root}/.sdlc.feedback/changelog/backup/improve-v1.0.0-20260326.md.bak
    ```
 
 3. **Update skill file**: Use `Edit` tool on global command
    ```
-   Edit ~/.claude/commands/feedback.md  # ✅ Absolute path
+   Edit ~/.claude/commands/improve.md  # ✅ Absolute path
    ```
 
 4. **Increment version**: Update version at bottom of skill file
@@ -133,34 +133,34 @@ If user approves updates:
 
 5. **Create changelog**: Write to feedback directory
    ```
-   {sdlc.root}/.sdlc.feedback/changelog/feedback-v1.1.0-20260326.changelog.md
+   {sdlc.root}/.sdlc.feedback/changelog/improve-v1.1.0-20260326.changelog.md
    ```
 
 **Example Paths (Always Absolute):**
 ```
-Source:    /Users/username/.claude/commands/feedback.md
-Backup:    {sdlc.root}/.sdlc.feedback/changelog/backup/feedback-v1.0.0-20260326.md.bak
-Changelog: {sdlc.root}/.sdlc.feedback/changelog/feedback-v1.1.0-20260326.changelog.md
+Source:    /Users/username/.claude/commands/improve.md
+Backup:    {sdlc.root}/.sdlc.feedback/changelog/backup/improve-v1.0.0-20260326.md.bak
+Changelog: {sdlc.root}/.sdlc.feedback/changelog/improve-v1.1.0-20260326.changelog.md
 ```
 
 **Recovery:**
 ```bash
 # Restore from backup (paths from ~/.sdlc/config.json sdlc.root)
-cp {sdlc.root}/.sdlc.feedback/changelog/backup/feedback-v1.0.0-20260326.md.bak ~/.claude/commands/feedback.md
+cp {sdlc.root}/.sdlc.feedback/changelog/backup/improve-v1.0.0-20260326.md.bak ~/.claude/commands/improve.md
 ```
 
 ## Output Structure
 
 ### Feedback Session Document
 
-Save to: `{sdlc.root}/.sdlc.feedback/docs/feedback-[skill-name]-[date].feedback.md`
+Save to: `{sdlc.root}/.sdlc.feedback/docs/improve-[skill-name]-[date].feedback.md`
 
 **Format:**
 ```markdown
 # Feedback: [Skill Name]
 
 **Date**: 2026-03-26
-**Skill Location**: /Users/username/.claude/commands/feedback.md
+**Skill Location**: /Users/username/.claude/commands/improve.md
 **Session Context**: [Brief 1-line description]
 
 ## User Feedback
@@ -175,9 +175,9 @@ Save to: `{sdlc.root}/.sdlc.feedback/docs/feedback-[skill-name]-[date].feedback.
 
 ## Status
 - [x] User approved
-- [x] Backup: `{sdlc.root}/.sdlc.feedback/changelog/backup/feedback-v1.0.0-20260326.md.bak`
-- [x] Updated: `/Users/username/.claude/commands/feedback.md` v1.0.0 → v1.1.0
-- [x] Changelog: `{sdlc.root}/.sdlc.feedback/changelog/feedback-v1.1.0-20260326.changelog.md`
+- [x] Backup: `{sdlc.root}/.sdlc.feedback/changelog/backup/improve-v1.0.0-20260326.md.bak`
+- [x] Updated: `/Users/username/.claude/commands/improve.md` v1.0.0 → v1.1.0
+- [x] Changelog: `{sdlc.root}/.sdlc.feedback/changelog/improve-v1.1.0-20260326.changelog.md`
 ```
 
 ### Changelog Document
@@ -215,7 +215,7 @@ Save to: `{sdlc.root}/.sdlc.feedback/changelog/[skill-name]-[version]-[date].cha
 ## Example Flow
 
 **User runs**: `/discuss State management`
-**After completion**: `/feedback discuss`
+**After completion**: `/improve discuss`
 
 ```markdown
 I'll help collect feedback on the `discuss` skill.
@@ -255,11 +255,11 @@ Apply these changes to `/Users/username/.claude/commands/discuss.md`?
 - Backs up to `{sdlc.root}/.sdlc.feedback/changelog/backup/discuss-v1.0.0-20260326.md.bak`
 - Updates `/Users/username/.claude/commands/discuss.md` → v1.1.0
 - Creates `{sdlc.root}/.sdlc.feedback/changelog/discuss-v1.1.0-20260326.changelog.md`
-- Saves `{sdlc.root}/.sdlc.feedback/docs/feedback-discuss-20260326.feedback.md`
+- Saves `{sdlc.root}/.sdlc.feedback/docs/improve-discuss-20260326.feedback.md`
 
 ## When to Use
 
-- ✅ After executing any **global command** (`/feedback`, `/discuss`, `/commit`, etc.)
+- ✅ After executing any **global command** (`/improve`, `/discuss`, `/commit`, etc.)
 - ✅ When user explicitly requests feedback
 - ✅ Periodically for frequently-used skills
 - ❌ Not for project-local skills (`actions/`, `workflows/`, `utils/`)
