@@ -13,35 +13,6 @@ Generate pull request content that explains **why** the change exists and **what
 **Flags**:
 - `--fetch` — Fetch base branch from remote before diffing (default: local-only)
 
-## What Makes a Good PR?
-
-**Answer these three questions:**
-
-1. **Why?** - What problem motivated this change?
-2. **What?** - What is the user-facing impact?
-3. **How?** - Technical details (only if necessary for understanding)
-
-**Bad PR Example:**
-```
-- Added function A
-- Modified file B
-- Updated class C
-- Refactored module D
-```
-← This tells me nothing about the purpose.
-
-**Good PR Example:**
-```
-## Summary
-Fix authentication timeout that caused users to be logged out after 5 minutes of inactivity.
-
-### Changes
-- Increased JWT token expiry to 24 hours
-- Added refresh token mechanism for seamless session renewal
-- Users stay logged in across browser sessions
-```
-← Clear purpose, clear impact.
-
 ## Process
 
 ### 1. Resolve Base & Diff
@@ -83,20 +54,14 @@ Then use `AskUserQuestion` to present the candidates. Once user selects, proceed
 
 ---
 
-**After base is confirmed**, run the diff:
+**After base is confirmed**, validate then diff:
 
 ```bash
-# For local branch refs (refs/heads/main):
-git rev-parse refs/heads/<base> || { echo "Base '<base>' not found locally."; exit 1; }
-git log <base>..HEAD --oneline        # Commits unique to this branch
-git diff <base>..HEAD --stat          # File overview
-git diff <base>..HEAD                 # Full diff
-
-# For remote tracking refs (origin/main):
-git rev-parse <base> || { echo "Base '<base>' not found. Run 'git fetch' first."; exit 1; }
-git log <base>..HEAD --oneline        # Commits unique to this branch
-git diff <base>..HEAD --stat          # File overview
-git diff <base>..HEAD                 # Full diff
+# local ref: git rev-parse refs/heads/<base>
+# remote ref: git rev-parse <base>  (must be fetched first)
+git log <base>..HEAD --oneline
+git diff <base>..HEAD --stat
+git diff <base>..HEAD
 ```
 
 ### 2. Find the Purpose (Why > What > How)
@@ -150,28 +115,14 @@ Only after answering these questions, proceed to understand the technical detail
 [Supporting changes - refactoring, cleanup, internal improvements]
 ```
 
-**Major** = The "main thing" this PR accomplishes
-- What problem did we solve?
-- What is the user-facing impact?
-- What behavior changed?
+**Major** = The "main thing" this PR accomplishes — what problem, what impact, what changed for users.
 
-**Minor** = Supporting work
-- Code cleanup, refactoring
-- Internal optimizations
-- Non-user-facing changes
+**Minor** = Supporting work — cleanup, refactoring, non-user-facing changes.
 
-**Tips:**
-- Focus on **outcomes**, not activities
-- Bad: "Added function A, renamed file B"
-- Good: "Simplified provider management with unified interface"
-
-### 4.5. Self-Correction Checklist
-
-Before outputting, verify:
-- [ ] Does the Summary answer "Why did we do this?"
-- [ ] Does Major section answer "Who benefits and how?"
-- [ ] Are we listing functions/files OR describing outcomes?
-- [ ] Would a non-technical stakeholder understand the impact?
+**Before outputting, verify:**
+- Does the Summary answer "Why did we do this?"
+- Does Major describe outcomes, not functions/files?
+- Would a non-technical stakeholder understand the impact?
 
 ### 5. Output Behavior
 
@@ -211,52 +162,7 @@ feat(auth): implement user authentication
 - **CLI command must be complete** — include the full `--title` value; body is separate (user pastes from Description block)
 - Never embed the full body inline in the shell command — keep body as its own copy block
 
-**With `auto_push: true`**:
-- Automatically executes `gh pr create` with generated content
-- Returns the created PR URL
-- Logs the PR creation to `.sdlc.docs/*.pr.md`
-
-## Examples
-
-### Example 1: Bug Fix
-
-**Title:** `bugfix(upload): resolve authentication timeout during file uploads`
-
-**Description:**
-```markdown
-## Summary
-File uploads were failing for files larger than 10MB because the JWT token expired during upload. This caused users to lose work and retry uploads.
-
-### Major
-- Uploads now complete successfully regardless of file size
-- Token refresh happens automatically in the background
-- No more "authentication failed" errors during long uploads
-
-### Minor
-- Updated token expiry check logic
-- Added retry handler for transient network errors
-```
-
-### Example 2: Feature
-
-**Title:** `feat(project): add project templates for quick setup`
-
-**Description:**
-```markdown
-## Summary
-Users had to manually configure each new project with the same settings. Now they can create and reuse project templates.
-
-### Major
-- Create projects from templates in one click
-- Templates include all settings, dependencies, and configurations
-- Reduces setup time from ~10 minutes to ~30 seconds
-
-### Minor
-- Extracted common config patterns into template schema
-- Added template validation on save
-```
-
-### Example 3: Refactor
+## Example
 
 **Title:** `refactor(command): unified provider command with interactive mode`
 
@@ -273,7 +179,6 @@ Provider management was scattered across 4 separate commands with inconsistent U
 ### Minor
 - Renamed add.go to provider_add.go for consistency
 - Removed unused shell command code
-- Cleaned up terminal output formatting
 ```
 
 ## Related Skills
@@ -284,4 +189,4 @@ Provider management was scattered across 4 separate commands with inconsistent U
 
 ---
 
-**Version**: 1.11.0 | **Updated**: 2026-05-10
+**Version**: 1.12.0 | **Updated**: 2026-05-10
