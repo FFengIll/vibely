@@ -14,8 +14,8 @@ mkdir -p ~/.claude/commands/
 # /sdlc:sdlc
 cp -R sdlc ~/.claude/commands/
 
-# or flatten /sdlc (recommend)
-cp -R sdlc/* ~/.claude/commands/
+# or link (recommend)
+ln -s sdlc ~/.claude/commands/sdlc
 ```
 
 ## Plugin / Skill
@@ -205,7 +205,7 @@ claude plugin install sdlc@sdlc-marketplace
 ---
 
 - Inspiration from https://github.com/karpathy/autoresearch
-- Implemented as `/feedback`
+- Implemented as `/improve`
 
 
 # Appendix
