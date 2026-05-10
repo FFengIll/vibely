@@ -205,7 +205,7 @@ claude plugin install sdlc@sdlc-marketplace
 ---
 
 - Inspiration from https://github.com/karpathy/autoresearch
-- Implemented as `/improve`
+- Implemented as `/action:feedback`
 
 
 # Appendix
