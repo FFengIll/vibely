@@ -106,7 +106,7 @@ After collecting responses:
 
 This skill ONLY edits global commands located at:
 - **Global skills**: `~/.claude/commands/*.md`
-- **DO NOT edit** project-local skills (`actions/`, `workflows/`, `utils/`)
+- **DO NOT edit** project-local skills (`actions/`, `workflows/`)
 
 If user approves updates:
 
@@ -262,7 +262,7 @@ Apply these changes to `/Users/username/.claude/commands/discuss.md`?
 - ✅ After executing any **global command** (`/improve`, `/discuss`, `/commit`, etc.)
 - ✅ When user explicitly requests feedback
 - ✅ Periodically for frequently-used skills
-- ❌ Not for project-local skills (`actions/`, `workflows/`, `utils/`)
+- ❌ Not for project-local skills (`actions/`, `workflows/`)
 - ❌ Not during workflow execution (wait until complete)
 - ❌ Not for simple utility commands (git, cache)
 
@@ -270,7 +270,7 @@ Apply these changes to `/Users/username/.claude/commands/discuss.md`?
 
 **This skill ONLY edits global commands:**
 - ✅ Files in `~/.claude/commands/*.md`
-- ❌ Project files in `actions/`, `workflows/`, `utils/`
+- ❌ Project files in `actions/`, `workflows/`
 
 **Why?** Project-local skills are version-controlled and team-shared. Global commands are user-specific configurations.
 
@@ -279,7 +279,7 @@ Apply these changes to `/Users/username/.claude/commands/discuss.md`?
 - `Read`: Review skill files and output documents
 - `Edit`: Update skill files based on feedback
 - `AskUserQuestion`: Collect structured feedback
-- `utils:doc`: Optional - log feedback history
+- `action:doc`: Optional - log feedback history
 
 ## Success Metrics
 

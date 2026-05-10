@@ -5,3 +5,9 @@ dist
 node_modules
 .vscode-test/
 *.vsix
+
+output
+.sdlc
+
+!.sdlc/changelog
+!.sdlc/harness

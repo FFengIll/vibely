@@ -1,6 +1,6 @@
-# Utility Skills
+# Action Skills
 
-This directory contains utility skills that support the SDLC workflow. These skills can be called at any time during the development process.
+This directory contains action and utility skills that support the SDLC workflow. These skills can be called at any time during the development process.
 
 ## Available Skills
 
@@ -52,7 +52,7 @@ These skills were created based on the SDLC v3.2 design document:
 ## File Structure
 
 ```
-utils/
+action/
 ├── README.md           # This file
 ├── discuss.md          # Technical discussion skill
 ├── doc.md              # Documentation skill

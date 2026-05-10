@@ -472,7 +472,7 @@ npm run e2e
 
 ## Related Skills
 
-- **`utils:branch`** - Branch and base detection (use this for consistent branch detection)
+- **`action:branch`** - Branch and base detection (use this for consistent branch detection)
 - **`/sdlc cr`** - Code review focuses on code quality
 - **`/sdlc test`** - Test verification
 - **`/sdlc validate`** - Active validation against harness
