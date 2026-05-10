@@ -99,13 +99,28 @@ git diff <base>..HEAD --stat          # File overview
 git diff <base>..HEAD                 # Full diff
 ```
 
-### 2. Understand the Change
+### 2. Find the Purpose (Why > What > How)
 
-Ask yourself:
-- What problem is being solved?
-- Who benefits? How?
-- What was broken/missing before?
-- What is the user-facing change?
+**CRITICAL**: Before writing anything, answer these three questions:
+
+1. **Why?** What problem motivated this change?
+   - What was broken, missing, or painful?
+   - What triggered the work?
+
+2. **So what?** Who benefits and how?
+   - What is the user-facing impact?
+   - What behavior actually changes?
+
+3. **Now what?** What's the outcome?
+   - Don't list functions/files
+   - Describe the result, not the activity
+
+**Example transformation:**
+| Too Technical | Purpose-Driven |
+|---------------|----------------|
+| "Added ClaudeClient type, moved transport logic to createSessionBoundTransport(), added AnthropicClientInterface, removed claude_util.go" | "OAuth provider support was duplicated across clients. Unified transport setup and extracted ClaudeClient for consistent behavior." |
+
+Only after answering these questions, proceed to understand the technical details.
 
 ### 3. Write Title
 
@@ -149,6 +164,14 @@ Ask yourself:
 - Focus on **outcomes**, not activities
 - Bad: "Added function A, renamed file B"
 - Good: "Simplified provider management with unified interface"
+
+### 4.5. Self-Correction Checklist
+
+Before outputting, verify:
+- [ ] Does the Summary answer "Why did we do this?"
+- [ ] Does Major section answer "Who benefits and how?"
+- [ ] Are we listing functions/files OR describing outcomes?
+- [ ] Would a non-technical stakeholder understand the impact?
 
 ### 5. Output Behavior
 
@@ -261,4 +284,4 @@ Provider management was scattered across 4 separate commands with inconsistent U
 
 ---
 
-**Version**: 1.10.0 | **Updated**: 2026-04-12
+**Version**: 1.11.0 | **Updated**: 2026-05-10
