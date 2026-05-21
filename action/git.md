@@ -1,6 +1,6 @@
 # Git Skill
 
-The `/git` skill assists with Git operations for SDLC workflows including status checks, diffs, branch management, and workflow helpers.
+The `/git` skill assists with Git operations for SDLC workflow including status checks, diffs, branch management, and workflow helpers.
 
 ## Usage
 
@@ -346,7 +346,7 @@ git merge hotfix/security-patch
 ## Dependencies
 
 - **cache**: Read branch protection rules and workflow configs, update workflow state
-- **doc**: Document Git workflows and conventions
+- **doc**: Document Git workflow and conventions
 
 ## Completion Criteria
 

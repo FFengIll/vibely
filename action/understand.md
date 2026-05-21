@@ -35,12 +35,12 @@ Builds comprehensive knowledge of the existing codebase by analyzing architectur
 
 Understand generates architecture cache at different levels based on scope:
 
-| Level | Scope Pattern | TTL Reference | Output Path |
-|-------|---------------|---------------|-------------|
-| **Project** | No scope (entire project) | ~30 days | `.sdlc/arch/overview-arch.md` |
-| **Module** | `src/[module]` or `[module]/` | ~14 days | `.sdlc/arch/[module]-arch.md` |
-| **Sub-module** | `src/[module]/[sub]` | ~7 days | `.sdlc/arch/[module]-[sub]-arch.md` |
-| **Component** | Deep dive into specific component | ~3 days | `.sdlc/arch/[module]-[sub]-[comp]-arch.md` |
+| Level          | Scope Pattern                     | TTL Reference | Output Path                                |
+| -------------- | --------------------------------- | ------------- | ------------------------------------------ |
+| **Project**    | No scope (entire project)         | ~30 days      | `.sdlc/arch/overview-arch.md`              |
+| **Module**     | `src/[module]` or `[module]/`     | ~14 days      | `.sdlc/arch/[module]-arch.md`              |
+| **Sub-module** | `src/[module]/[sub]`              | ~7 days       | `.sdlc/arch/[module]-[sub]-arch.md`        |
+| **Component**  | Deep dive into specific component | ~3 days       | `.sdlc/arch/[module]-[sub]-[comp]-arch.md` |
 
 > **Note**: Cache files are stored directly in `.sdlc/arch/` with a flat structure. The scope is encoded in the filename rather than using subdirectories.
 
@@ -157,9 +157,9 @@ fi
 
 ## Components
 
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| [Component] | [path] | [what it does] |
+| Component   | Location | Purpose        |
+| ----------- | -------- | -------------- |
+| [Component] | [path]   | [what it does] |
 
 ## Dependencies
 - [Dependency 1] - [how it's used]
@@ -269,7 +269,7 @@ Focuses on:
 - Error handling
 - Integration points
 
-## Integration in Workflows
+## Integration in workflow
 
 ### Feature Development
 ```

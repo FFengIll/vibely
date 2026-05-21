@@ -35,4 +35,4 @@ When invoked without arguments, it will guide you to define a new command. When 
 ### When to Use
 - Creating a new slash command for frequently used prompts
 - Updating an existing command with better instructions
-- Standardizing workflows that are currently ad-hoc
+- Standardizing workflow that are currently ad-hoc

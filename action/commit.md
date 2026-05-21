@@ -1,6 +1,6 @@
 # /commit
 
-/commit creates a git commit with proper file selection and message formatting. Works standalone or within SDLC workflows.
+/commit creates a git commit with proper file selection and message formatting. Works standalone or within SDLC workflow.
 
 **Purpose**: Commit changes with proper file selection, separation of concerns, and conventional commit messages
 

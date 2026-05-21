@@ -106,7 +106,7 @@ After collecting responses:
 
 This skill ONLY edits global commands located at:
 - **Global skills**: `~/.claude/commands/*.md`
-- **DO NOT edit** project-local skills (`actions/`, `workflows/`)
+- **DO NOT edit** project-local skills (`action/`, `workflow/`)
 
 If user approves updates:
 
@@ -261,7 +261,7 @@ Apply these changes to `/Users/username/.claude/commands/discuss.md`?
 - ✅ After executing any **global command** (`/feedback`, `/discuss`, `/commit`, etc.)
 - ✅ When user explicitly requests feedback
 - ✅ Periodically for frequently-used skills
-- ❌ Not for project-local skills (`actions/`, `workflows/`)
+- ❌ Not for project-local skills (`action/`, `workflow/`)
 - ❌ Not during workflow execution (wait until complete)
 - ❌ Not for simple utility commands (git, cache)
 
@@ -269,7 +269,7 @@ Apply these changes to `/Users/username/.claude/commands/discuss.md`?
 
 **This skill ONLY edits global commands:**
 - ✅ Files in `~/.claude/commands/*.md`
-- ❌ Project files in `actions/`, `workflows/`
+- ❌ Project files in `action/`, `workflow/`
 
 **Why?** Project-local skills are version-controlled and team-shared. Global commands are user-specific configurations.
 

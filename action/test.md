@@ -108,7 +108,7 @@ Checks run in this order (fast-fail strategy):
 ```
 
 ### 6. E2E Tests
-**Purpose**: Test complete user workflows
+**Purpose**: Test complete user workflow
 
 **Coverage**: Critical user paths, cross-system flows
 

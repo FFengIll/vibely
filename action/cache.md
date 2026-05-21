@@ -20,7 +20,7 @@ The `/cache` skill manages SDLC workflow state and cached architecture documenta
 
 ### Overview
 
-Architecture documentation is cached in `.sdlc/docs/arch/` to avoid repeated code analysis during SDLC workflows. See [ARCH_CACHE_SYSTEM.md](../../.sdlc/docs/arch/ARCH_CACHE_SYSTEM.md) for full documentation.
+Architecture documentation is cached in `.sdlc/docs/arch/` to avoid repeated code analysis during SDLC workflow. See [ARCH_CACHE_SYSTEM.md](../../.sdlc/docs/arch/ARCH_CACHE_SYSTEM.md) for full documentation.
 
 ### Cache Structure
 
@@ -62,12 +62,12 @@ Architecture documentation is cached in `.sdlc/docs/arch/` to avoid repeated cod
 
 ### Cache Levels
 
-| Level | Pattern | TTL | Example | Use Case |
-|-------|---------|-----|---------|----------|
-| **Project** | `overview-arch.md` | 7 days | `.sdlc/docs/arch/overview-arch.md` | Whole project context |
-| **Module** | `[module]-arch.md` | 3 days | `.sdlc/docs/arch/auth-arch.md` | Feature work on module |
-| **Component** | `[module]/[sub]-arch.md` | 1 day | `.sdlc/docs/arch/auth/login-arch.md` | Deep dive into component |
-| **Detailed** | `[module]/[sub]/[detail]-arch.md` | 12h | `.sdlc/docs/arch/auth/providers/oauth-arch.md` | Detailed analysis |
+| Level         | Pattern                           | TTL    | Example                                        | Use Case                 |
+| ------------- | --------------------------------- | ------ | ---------------------------------------------- | ------------------------ |
+| **Project**   | `overview-arch.md`                | 7 days | `.sdlc/docs/arch/overview-arch.md`             | Whole project context    |
+| **Module**    | `[module]-arch.md`                | 3 days | `.sdlc/docs/arch/auth-arch.md`                 | Feature work on module   |
+| **Component** | `[module]/[sub]-arch.md`          | 1 day  | `.sdlc/docs/arch/auth/login-arch.md`           | Deep dive into component |
+| **Detailed**  | `[module]/[sub]/[detail]-arch.md` | 12h    | `.sdlc/docs/arch/auth/providers/oauth-arch.md` | Detailed analysis        |
 
 ### Cache File Format
 
@@ -129,11 +129,11 @@ fi
 
 ### Auto-Refresh Rules
 
-| Trigger | Paths Affected | Cache Levels to Invalidate |
-|---------|----------------|---------------------------|
-| Git commit to `src/auth/` | `src/auth/**` | auth-arch.md, auth/**/* |
-| Config file change | `config/**` | overview-arch.md |
-| Package.json change | `package.json` | overview-arch.md |
+| Trigger                   | Paths Affected | Cache Levels to Invalidate |
+| ------------------------- | -------------- | -------------------------- |
+| Git commit to `src/auth/` | `src/auth/**`  | auth-arch.md, auth/**/*    |
+| Config file change        | `config/**`    | overview-arch.md           |
+| Package.json change       | `package.json` | overview-arch.md           |
 
 ## Workflow State Cache
 

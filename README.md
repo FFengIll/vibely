@@ -194,7 +194,7 @@ claude plugin install sdlc@sdlc-marketplace
 
 * Embrace continuous improvement:
   * Evaluate what worked and what didn't
-  * Update workflows based on real experience
+  * Update workflow based on real experience
   * Let each iteration inform the next
   * ……
 

@@ -160,11 +160,11 @@ understand → research → doc → discuss → END
 - **Use cases**: ...
 
 ## Comparison Matrix
-| Feature | Option 1 | Option 2 | Option 3 |
-|---------|----------|----------|----------|
-| Performance | ... | ... | ... |
-| Complexity | ... | ... | ... |
-| Cost | ... | ... | ... |
+| Feature     | Option 1 | Option 2 | Option 3 |
+| ----------- | -------- | -------- | -------- |
+| Performance | ...      | ...      | ...      |
+| Complexity  | ...      | ...      | ...      |
+| Cost        | ...      | ...      | ...      |
 
 ## Recommendation
 **Selected**: [Option X]
@@ -231,14 +231,14 @@ Understand problem domain, requirements
 Study competing solutions
 **Output**: Feature comparison, gap analysis
 
-## Key Differences from Other Workflows
+## Key Differences from Other workflow
 
-| Feature | Bugfix | Refactor | Research |
-|---------|--------|----------|----------|
-| Produces code | Produces fix | Improves code | Produces knowledge |
-| Has test phase | Has test phase | Has test phase | No test phase |
-| Merges to main | Merges to main | Merges to main | Ends with doc |
-| User-facing | Bug-focused | Internal | Informative |
+| Feature        | Bugfix         | Refactor       | Research           |
+| -------------- | -------------- | -------------- | ------------------ |
+| Produces code  | Produces fix   | Improves code  | Produces knowledge |
+| Has test phase | Has test phase | Has test phase | No test phase      |
+| Merges to main | Merges to main | Merges to main | Ends with doc      |
+| User-facing    | Bug-focused    | Internal       | Informative        |
 
 ## Notes
 

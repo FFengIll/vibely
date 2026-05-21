@@ -1,6 +1,6 @@
 # /debug
 
-/debug is the entry point for bug fix workflows in the SDLC. This phase focuses on identifying, understanding, and preparing fixes for bugs.
+/debug is the entry point for bug fix workflow in the SDLC. This phase focuses on identifying, understanding, and preparing fixes for bugs.
 
 **Purpose**: Debug and fix bugs in the codebase
 

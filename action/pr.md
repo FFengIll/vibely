@@ -81,8 +81,8 @@ git diff <base>..HEAD
    - Describe the result, not the activity
 
 **Example transformation:**
-| Too Technical | Purpose-Driven |
-|---------------|----------------|
+| Too Technical                                                                                                                             | Purpose-Driven                                                                                                                      |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | "Added ClaudeClient type, moved transport logic to createSessionBoundTransport(), added AnthropicClientInterface, removed claude_util.go" | "OAuth provider support was duplicated across clients. Unified transport setup and extracted ClaudeClient for consistent behavior." |
 
 Only after answering these questions, proceed to understand the technical details.
@@ -95,11 +95,11 @@ Only after answering these questions, proceed to understand the technical detail
 - Lowercase, under 72 chars
 - Describe the **outcome**, not the action
 
-| Bad | Good |
-|-----|------|
-| `feat: add login function` | `feat(auth): implement user authentication` |
-| `refactor: rename files` | `refactor(command): unify provider command interface` |
-| `fix: bug in auth` | `bugfix(server): resolve authentication timeout issue` |
+| Bad                        | Good                                                   |
+| -------------------------- | ------------------------------------------------------ |
+| `feat: add login function` | `feat(auth): implement user authentication`            |
+| `refactor: rename files`   | `refactor(command): unify provider command interface`  |
+| `fix: bug in auth`         | `bugfix(server): resolve authentication timeout issue` |
 
 ### 4. Write Description
 

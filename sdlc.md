@@ -18,8 +18,8 @@ Software Development Lifecycle management with intelligent intent detection and 
 
 ## Actions
 
-| Skill              | Cmd        | Intent keywords                                 |
-| ------------------ | ---------- | ----------------------------------------------- |
+| Skill             | Cmd        | Intent keywords                                 |
+| ----------------- | ---------- | ----------------------------------------------- |
 | action:guard      | guard      | safety, before work                             |
 | action:plan       | plan       | plan, design plan, 规划                         |
 | action:understand | understand | understand, analyze architecture, build context |
@@ -38,17 +38,17 @@ Software Development Lifecycle management with intelligent intent detection and 
 | action:secure     | secure     | security, secure                                |
 | action:harness    | harness    | harness, verification                           |
 | action:validate   | validate   | validate                                        |
-| feedback           | feedback   | feedback, score                                 |
+| feedback          | feedback   | feedback, score                                 |
 
-## Workflows
+## workflow
 
-| Skill              | Intent keywords                           | Pipeline                                       |
-| ------------------ | ----------------------------------------- | ---------------------------------------------- |
-| workflow:bugfix   | fix, bug, issue, error, 修复              | understand→debug→coding→test→validate→secure→commit→pr         |
+| Skill             | Intent keywords                           | Pipeline                                                          |
+| ----------------- | ----------------------------------------- | ----------------------------------------------------------------- |
+| workflow:bugfix   | fix, bug, issue, error, 修复              | understand→debug→coding→test→validate→secure→commit→pr            |
 | workflow:feature  | add, new feature, implement, 添加, 新功能 | understand→research→spec→coding→test→validate→secure→cr→commit→pr |
-| workflow:refactor | refactor, clean up, 重构                  | understand→spec→coding→test→commit→pr          |
-| workflow:research | research, investigate, 研究               | understand→research→doc→discuss→END            |
-| workflow:minor    | minor, small change, 小改动               | coding→test→commit                             |
+| workflow:refactor | refactor, clean up, 重构                  | understand→spec→coding→test→commit→pr                             |
+| workflow:research | research, investigate, 研究               | understand→research→doc→discuss→END                               |
+| workflow:minor    | minor, small change, 小改动               | coding→test→commit                                                |
 
 
 ---
